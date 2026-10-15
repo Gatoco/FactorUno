@@ -108,8 +108,8 @@ gantt
 ### Plazos y responsables
 
 - **Hitos fijos (fuente: bitácora del proyecto):** Evaluación 1 el **18-09-2026**, despliegue en AWS el **15-10-2026** y entrega de la Evaluación 2 en la **semana del 12 al 18 de octubre de 2026 (viernes 16-10)**.
-- **Fechas intermedias (supuesto):** las fechas de inicio y término de cada sprint corresponden al **cronograma planificado**; se derivan de los hitos fijos y de la disponibilidad del equipo.
-- **Responsables (supuesto):** el desarrollo se asigna al grupo t420. Salvo Benjamín Cifuentes Vergara, la bitácora no registra los nombres de los demás integrantes, por lo que los responsables se expresan por rol.
+- **Fechas intermedias (supuesto):** las fechas de inicio y término de cada sprint corresponden al **cronograma planificado**; se derivan de los hitos fijos y de la disponibilidad del autor.
+- **Responsables:** proyecto **individual** (grupo t420); todas las actividades se asignan a **Benjamín Cifuentes Vergara**, que cumple los roles de análisis funcional, desarrollo y despliegue.
 - **Capacidad:** cada sprint mantiene plazos **alcanzables** porque reutiliza la base ya construida (el núcleo funcional existe desde antes de la Evaluación 1) y las iteraciones posteriores son incrementales sobre ese mismo código.
 
 ---

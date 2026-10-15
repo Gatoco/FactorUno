@@ -1,4 +1,4 @@
-**Objetivo:** video de 5–7 minutos mostrando el sistema funcionando, con **todos los integrantes en cámara**.
+**Objetivo:** video de 5–7 minutos mostrando el sistema funcionando, con el autor **hablando a cámara**.
 **Regla del profesor:** mostrar la aplicación, no disertar. Cada frase dura 5–10 segundos.
 
 ---
@@ -9,16 +9,12 @@
 - [ ] Usuario `admin` / `Admin1234!` (para editar). El rol `analista` / `Analista1234!` se usa al final, en el móvil.
 - [ ] Tener a mano los archivos: `demo/carga-montos-demo-error.csv` y `demo/carga-montos-demo.csv`.
 - [ ] Cerrar notificaciones y pestañas. Grabar la pantalla completa en 1080p.
-- [ ] Repartir los bloques entre los integrantes (abajo) para que **todos aparezcan**.
+- [ ] Aparecer en cámara, aunque sea en un recuadro en una esquina de la grabación.
 - [ ] Duración objetivo: 5–7 min. Si algo se traba, se corta y se repite esa toma.
 
-## 1. Reparto sugerido
+## 1. Quién narra
 
-| Integrante | Bloques | Tema |
-|---|---|---|
-| A | 1 – 3 | Login, grilla y filtros, ingreso manual |
-| B | 4 – 5 | Factores y detalle, auditoría |
-| C | 6 – 8 | Carga CSV, exportación, vista móvil |
+Es un **proyecto individual**: una sola persona narra y muestra todas las tomas. Al cambiar de usuario, alcanza con decir "ahora entro como analista".
 
 ## 2. Toma por toma
 
@@ -35,7 +31,7 @@
 | 9 | Botón **Exportar** → **JSON** | "El respaldo se publica en S3 y devuelve una URL firmada, que abre la descarga." | Modal y luego la descarga del JSON en una pestaña nueva |
 | 10 | Cambiar a `analista` y abrir en vista móvil (390 px) | "En el teléfono la grilla se convierte en tarjetas y el formulario se apila en una columna." | Grilla como tarjetas + modal de ingreso en una columna |
 
-**Cierre en cámara (30 s, todos frente a la cámara):**
+**Cierre en cámara (30 s):**
 "El repositorio, el informe y la solución en la nube están en el documento de entrega. La aplicación corre en AWS con IP elástica, y el correo de la cuenta es el que está en ese documento."
 
 ## 3. Si algo falla
