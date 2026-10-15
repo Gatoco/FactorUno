@@ -26,7 +26,9 @@ Proyecto del ramo **Proyecto Integrado** (INACAP), basado en un requerimiento re
 - **Cálculo automático** de factores (columnas 8 a 37, redondeo a 8 decimales)
 - **Carga masiva CSV** de montos (DJ 1948) o factores, con actualización por llave si el registro ya existe
 - **Prioridad del corredor**: la información local nunca altera la de la Bolsa
-- **Auditoría** de ingreso, modificación y eliminación (log con fecha y hora)
+- **Auditoría** de ingreso, modificación y eliminación (log con fecha y hora, con el usuario autenticado)
+- **Seguridad**: login con JWT y roles (admin / analista / consulta); matriz de permisos aplicada en API y UI
+- **Exportes**: respaldo de auditoría en DynamoDB y exportes JSON/CSV a S3 con URL firmada (opcional, se activa por variables de entorno)
 
 ## Stack tecnológico
 
@@ -35,6 +37,8 @@ Proyecto del ramo **Proyecto Integrado** (INACAP), basado en un requerimiento re
 | Frontend | React + Vite | Interfaz: grilla, formularios, carga de archivos |
 | Backend | Python + FastAPI | API REST y reglas de negocio |
 | Base de datos | SQLite | Almacenamiento local, sin instalación |
+| Seguridad | JWT + bcrypt | Autenticación, roles y auditoría por usuario |
+| Nube (opcional) | DynamoDB + S3 | Historial de auditoría y exportes (AWS) |
 
 ## Requisitos previos
 
@@ -53,6 +57,8 @@ Proyecto del ramo **Proyecto Integrado** (INACAP), basado en un requerimiento re
 ```bash
 docker compose up --build
 ```
+
+Opcional: `cp .env.example .env` para definir el secreto JWT y las contraseñas (por defecto usa las credenciales de demostración indicadas más abajo).
 
 Abrir [http://localhost:5173](http://localhost:5173). La API queda en `http://localhost:8001/api`.
 
@@ -78,12 +84,33 @@ npm run dev
 
 Abrir [http://localhost:5173](http://localhost:5173). La API queda en `http://localhost:8001/api`.
 
+## Credenciales de demostración
+
+| Usuario | Contraseña | Rol | Permisos |
+|---|---|---|---|
+| `admin` | `Admin1234!` | admin | Todo |
+| `analista` | `Analista1234!` | analista | Lectura, escritura, carga masiva y auditoría |
+| `consulta` | `Consulta1234!` | consulta | Solo lectura |
+
+> Cambiar estas contraseñas y `FACTORUNO_SECRET` en producción (ver `.env.example`).
+
 ## Uso
 
-1. **Ingresar calificación**: completar datos básicos (mercado, instrumento, fecha, secuencia) y los 29 campos de montos.
-2. **Calcular**: el sistema convierte los montos en factores (validación: suma de factores 8-19 ≤ 1).
-3. **Cargar CSV**: subir archivo con montos o factores; los registros existentes se actualizan por llave (ejercicio + mercado + instrumento + fecha + secuencia + dividendo + tipo sociedad).
-4. **Auditoría**: pestaña con el log de todas las operaciones.
+1. **Iniciar sesión** con las credenciales de demostración.
+2. **Ingresar calificación**: completar datos básicos (mercado, instrumento, fecha, secuencia) y los 29 campos de montos.
+3. **Calcular**: el sistema convierte los montos en factores (validación: suma de factores 8-19 ≤ 1).
+4. **Cargar CSV**: subir archivo con montos o factores; los registros existentes se actualizan por llave (ejercicio + mercado + instrumento + fecha + secuencia + dividendo + tipo sociedad).
+5. **Auditoría**: pestaña con el log de todas las operaciones.
+
+## Pruebas
+
+```bash
+cd backend
+source .venv/bin/activate
+pytest tests/ -q --cov=app
+```
+
+98 pruebas: 62 unitarias (reglas de negocio), 16 de autenticación y roles, 9 integrales de API, 8 de integración AWS (DynamoDB/S3 simulados) y 3 de rendimiento. Cobertura: 96 %; carga CSV de 500 filas en 0,11 s.
 
 ## Glosario tributario
 
@@ -106,18 +133,25 @@ Abrir [http://localhost:5173](http://localhost:5173). La API queda en `http://lo
 ## Estructura del proyecto
 
 ```
-mantenedor/
+factoruno/
 ├── backend/
-│   └── app/
-│       ├── main.py       →  API (rutas)
-│       ├── servicio.py   →  lógica de negocio (CRUD, CSV, auditoría)
-│       ├── reglas.py     →  reglas del HDU (cálculo de factores)
-│       └── db.py         →  base de datos SQLite
+│   ├── app/
+│   │   ├── main.py       →  API (rutas)
+│   │   ├── servicio.py   →  lógica de negocio (CRUD, CSV, auditoría, exportes)
+│   │   ├── reglas.py     →  reglas del HDU (cálculo de factores)
+│   │   ├── auth.py       →  autenticación JWT y roles
+│   │   ├── aws_ext.py    →  DynamoDB (auditoría) y S3 (exportes)
+│   │   └── db.py         →  base de datos SQLite
+│   └── tests/            →  pruebas unitarias, integrales y de rendimiento
 ├── frontend/
 │   └── src/
-│       ├── App.jsx       →  pantalla principal
-│       ├── api.js        →  comunicación con el backend
+│       ├── App.jsx       →  pantalla principal + login
+│       ├── api.js        →  comunicación con el backend (token Bearer)
 │       └── columnas.js   →  nombres de los 30 factores
+├── docs/
+│   ├── informe/          →  secciones del informe (rúbrica Ev2)
+│   └── seguridad/        →  amenazas/mitigación y codificación segura
+├── odd/tasks/            →  seguimiento del trabajo (ODD)
 └── README.md
 ```
 
@@ -131,8 +165,10 @@ mantenedor/
 - [x] Backend: CRUD, cálculo de factores, carga CSV, auditoría
 - [x] Frontend: grilla, filtros, formulario, detalle, carga CSV
 - [x] Validaciones de negocio (suma ≤ 1, 8 decimales)
+- [x] Seguridad: JWT + roles, hardening (CORS, CSP, headers), STRIDE y codificación segura documentados
+- [x] Pruebas: 98 pruebas (unitarias, integrales, rendimiento) — 96 % de cobertura
+- [x] Nube: DynamoDB (auditoría) y S3 (exportes) + despliegue en AWS (RHEL 9 + Docker Compose)
 - [ ] Módulo RAG (asistente de preguntas) — siguiente paso
-- [ ] Pruebas automatizadas — siguiente paso
 
 ## Licencia
 
