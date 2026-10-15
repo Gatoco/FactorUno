@@ -15,7 +15,7 @@ Sistema web para que un **corredor de bolsa** registre los montos de dividendos 
 
 Los corredores de bolsa reciben cada año la información tributaria de las empresas en **PDF sin formato estándar**. Eso hace imposible automatizar la lectura, por lo que los datos deben ingresarse manualmente y convertirse en factores.
 
-Este sistema ordena ese proceso: **ingreso manual de montos, cálculo automático de factores, carga masiva por CSV, prioridad local del corredor y auditoría completa** de cada operación.
+Este sistema ordena ese proceso: **ingreso manual de montos, cálculo automático de factores, carga masiva por CSV, prioridad local del corredor, exportación de respaldos y auditoría completa** de cada operación.
 
 Proyecto del ramo **Proyecto Integrado** (INACAP), basado en un requerimiento real de la empresa **nuam** — el holding que une las bolsas de Santiago, Lima y Colombia.
 
@@ -24,11 +24,14 @@ Proyecto del ramo **Proyecto Integrado** (INACAP), basado en un requerimiento re
 - **Mantenedor** con filtros por mercado (acciones, CFI, fondos mutuos), origen y período comercial
 - **Ingreso manual** de calificaciones con 29 campos de montos
 - **Cálculo automático** de factores (columnas 8 a 37, redondeo a 8 decimales)
-- **Carga masiva CSV** de montos (DJ 1948) o factores, con actualización por llave si el registro ya existe
+- **Carga masiva CSV** de montos (DJ 1948) o factores, con vista previa y validación de formato por línea antes de grabar, y actualización por llave si el registro ya existe
+- **Interfaz adaptable**: la grilla y la auditoría se reordenan como tarjetas en pantallas pequeñas (menos de 560 px)
+- **Suma de la base 8–19 en vivo** al completar los factores, con aviso cuando supera 1
+- **Agrupación por concepto de homologación SII** visible bajo cada campo de montos y factores
 - **Prioridad del corredor**: la información local nunca altera la de la Bolsa
 - **Auditoría** de ingreso, modificación y eliminación (log con fecha y hora, con el usuario autenticado)
 - **Seguridad**: login con JWT y roles (admin / analista / consulta); matriz de permisos aplicada en API y UI
-- **Exportes**: respaldo de auditoría en DynamoDB y exportes JSON/CSV a S3 con URL firmada (opcional, se activa por variables de entorno)
+- **Exportes**: botón de exportación JSON/CSV en la interfaz y respaldo de auditoría en DynamoDB, con URL firmada de S3 (opcional, se activa por variables de entorno)
 
 ## Stack tecnológico
 
@@ -97,10 +100,11 @@ Abrir [http://localhost:5173](http://localhost:5173). La API queda en `http://lo
 ## Uso
 
 1. **Iniciar sesión** con las credenciales de demostración.
-2. **Ingresar calificación**: completar datos básicos (mercado, instrumento, fecha, secuencia) y los 29 campos de montos.
-3. **Calcular**: el sistema convierte los montos en factores (validación: suma de factores 8-19 ≤ 1).
-4. **Cargar CSV**: subir archivo con montos o factores; los registros existentes se actualizan por llave (ejercicio + mercado + instrumento + fecha + secuencia + dividendo + tipo sociedad).
+2. **Ingresar calificación**: completar datos básicos (mercado, instrumento, fecha, secuencia) y los 29 campos de montos, agrupados por concepto de homologación SII.
+3. **Calcular**: el sistema convierte los montos en factores; la suma de la base 8-19 se muestra en vivo y avisa si supera 1.
+4. **Cargar CSV**: subir archivo con montos o factores; la aplicación muestra una vista previa con los registros detectados y los avisos de formato antes de grabar, y actualiza por llave (ejercicio + mercado + instrumento + fecha + secuencia + dividendo + tipo sociedad).
 5. **Auditoría**: pestaña con el log de todas las operaciones.
+6. **Exportar**: botón que genera el respaldo JSON/CSV, lo publica en S3 y abre la URL firmada (cuando la nube está configurada).
 
 ## Pruebas
 
@@ -110,7 +114,7 @@ source .venv/bin/activate
 pytest tests/ -q --cov=app
 ```
 
-98 pruebas: 62 unitarias (reglas de negocio), 16 de autenticación y roles, 9 integrales de API, 8 de integración AWS (DynamoDB/S3 simulados) y 3 de rendimiento. Cobertura: 96 %; carga CSV de 500 filas en 0,11 s.
+99 pruebas: 62 unitarias (reglas de negocio), 16 de autenticación y roles, 9 integrales de API, 9 de integración AWS (DynamoDB/S3 simulados) y 3 de rendimiento. Cobertura: 94 %; carga CSV de 500 filas en 0,11 s.
 
 ## Glosario tributario
 
@@ -147,7 +151,7 @@ factoruno/
 │   └── src/
 │       ├── App.jsx       →  pantalla principal + login
 │       ├── api.js        →  comunicación con el backend (token Bearer)
-│       └── columnas.js   →  nombres de los 30 factores
+│       └── columnas.js   →  nombres de los 30 factores y agrupación por concepto SII
 ├── docs/
 │   ├── informe/          →  secciones del informe (rúbrica Ev2)
 │   └── seguridad/        →  amenazas/mitigación y codificación segura
@@ -163,10 +167,10 @@ factoruno/
 ## Estado del proyecto
 
 - [x] Backend: CRUD, cálculo de factores, carga CSV, auditoría
-- [x] Frontend: grilla, filtros, formulario, detalle, carga CSV
+- [x] Frontend: grilla, filtros, formulario, detalle, carga CSV con vista previa, exportación a S3 y vista móvil en tarjetas
 - [x] Validaciones de negocio (suma ≤ 1, 8 decimales)
 - [x] Seguridad: JWT + roles, hardening (CORS, CSP, headers), STRIDE y codificación segura documentados
-- [x] Pruebas: 98 pruebas (unitarias, integrales, rendimiento) — 96 % de cobertura
+- [x] Pruebas: 99 pruebas (unitarias, integrales, rendimiento) — 94 % de cobertura
 - [x] Nube: DynamoDB (auditoría) y S3 (exportes) + despliegue en AWS (RHEL 9 + Docker Compose)
 - [ ] Módulo RAG (asistente de preguntas) — siguiente paso
 
