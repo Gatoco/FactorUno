@@ -29,10 +29,10 @@ export default function App() {
   const [sesion, setSesion] = useState(null)
   const [verificando, setVerificando] = useState(true)
 
-  async function cargar() {
+  async function cargar(f = filtros) {
     setCargando(true)
     try {
-      const r = await api.listar(filtros)
+      const r = await api.listar(f)
       setFilas(r)
     } catch (e) {
       mostrarAviso(e.message, true)
@@ -89,7 +89,7 @@ export default function App() {
 
       {pestana === 'calificaciones' ? (
         <>
-          <Filtros filtros={filtros} setFiltros={setFiltros} onBuscar={cargar} />
+          <Filtros filtros={filtros} setFiltros={setFiltros} onBuscar={cargar} onLimpiar={() => { const v = { mercado: '', origen: '', periodo: '' }; setFiltros(v); cargar(v) }} />
           {puedeEscribir && (
             <div className="toolbar">
               <button className="btn prim" onClick={() => setModal({ modo: 'crear', form: vacia() })}>Ingresar</button>
@@ -154,7 +154,7 @@ export default function App() {
   )
 }
 
-function Filtros({ filtros, setFiltros, onBuscar }) {
+function Filtros({ filtros, setFiltros, onBuscar, onLimpiar }) {
   return (
     <div className="filtros">
       <label>Mercado
@@ -171,7 +171,7 @@ function Filtros({ filtros, setFiltros, onBuscar }) {
         <input type="number" value={filtros.periodo} onChange={(e) => setFiltros({ ...filtros, periodo: e.target.value })} placeholder="2025" />
       </label>
       <button className="btn prim" onClick={onBuscar}>Buscar</button>
-      <button className="btn" onClick={() => { setFiltros({ mercado: '', origen: '', periodo: '' }); onBuscar() }}>Limpiar</button>
+      <button className="btn" onClick={onLimpiar}>Limpiar</button>
     </div>
   )
 }
