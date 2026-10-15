@@ -17,3 +17,6 @@ backend/data/
 
 # Entorno
 .env
+
+# Informe (HTML generado; se versionan .md, .css, img/ y PDF)
+docs/informe/00-informe-ev2.html

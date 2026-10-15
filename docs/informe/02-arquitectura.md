@@ -71,8 +71,8 @@ flowchart LR
         end
         subgraph ALMACEN[Almacenamiento]
             SQL[(SQLite · mantenedor.db)]
-            DDB[(DynamoDB · auditoría)*]
-            S3[(Amazon S3 · archivos)*]
+            DDB[(DynamoDB · auditoría)]
+            S3[(Amazon S3 · archivos)]
         end
     end
 
@@ -82,8 +82,8 @@ flowchart LR
     SERV --> REG
     SERV --> DBM
     DBM --> SQL
-    SERV -.->|"historial (previsto)"| DDB
-    SERV -.->|"CSV / exportes (previsto)"| S3
+    SERV -->|"espejo de auditoría (boto3)"| DDB
+    SERV -->|"exportes JSON/CSV + URL firmada"| S3
 ```
 
 > `*` DynamoDB y Amazon S3 corresponden a la base no estructurada prevista en la Evaluación 2; la aplicación degrada de forma limpia si no están configurados.
@@ -199,9 +199,9 @@ Se detallan las tecnologías que componen la solución, su rol, las alternativas
 | **RHEL 9** | Sistema operativo del servidor | Ubuntu, Debian, Amazon Linux | **Recomendación explícita del profesor** (Red Hat), que además responde al contexto empresarial del cliente |
 | **EC2 t3.small** | Cómputo en la nube para la aplicación | t2.micro, AWS Lambda, contenedores gestionados | Tamaño suficiente para dos contenedores y una base SQLite, con disponibilidad dentro del AWS Academy Learner Lab |
 | **AWS Academy Learner Lab** | Entorno de nube provisto por la asignatura | Cuenta AWS propia, capa gratuita | Es el entorno con el que el profesor verifica la solución usando la **cuenta del alumno** y la **IP elástica** |
-| **Amazon DynamoDB** (previsto) | Base no estructurada para el historial de auditoría | MongoDB, Redis | Servicio gestionado y sin servidor; adecuado para el historial de eventos de auditoría |
-| **Amazon S3** (previsto) | Almacenamiento de CSV originales y exportes JSON | Almacenamiento en el sistema de archivos local | Almacenamiento de objetos durable y accesible, idóneo para archivos de carga y respaldos |
-| **boto3** (previsto) | SDK de AWS para integrar DynamoDB y S3 desde la aplicación | AWS CLI, otro SDK | Es el SDK oficial de Python, integrado en el mismo backend FastAPI |
+| **Amazon DynamoDB** | Base no estructurada para el historial de auditoría | MongoDB, Redis | Servicio gestionado y sin servidor; adecuado para el historial de eventos de auditoría |
+| **Amazon S3** | Almacenamiento de CSV originales y exportes JSON | Almacenamiento en el sistema de archivos local | Almacenamiento de objetos durable y accesible, idóneo para archivos de carga y respaldos |
+| **boto3** | SDK de AWS para integrar DynamoDB y S3 desde la aplicación | AWS CLI, otro SDK | Es el SDK oficial de Python, integrado en el mismo backend FastAPI |
 
 ### ¿Por qué nube?
 
@@ -216,4 +216,4 @@ El profesor exige que la solución esté **disponible en la nube** para que **cu
 ## Fuentes y supuestos
 
 - **Fuentes:** rúbrica oficial de Evaluación 2 (AAI); bitácora del proyecto (datos de despliegue: EC2 t3.small, RHEL 9.8, Elastic IP, security group 22/80/443/8000 y verificación pública); repositorio `Gatoco/FactorUno` (`README.md`, `docker-compose.yml`, `backend/app/*`, `frontend/*`).
-- **Supuestos:** los servicios DynamoDB y S3 se marcan como *previstos*, ya que corresponden a la base no estructurada de la Evaluación 2; los puertos de despliegue (`80` y `8000`) se ajustan respecto de los valores de desarrollo (`5173:80` y `8001:8000`) del `docker-compose.yml` del repositorio.
+- **Supuestos:** los puertos de despliegue (`80` y `8000`) se ajustan respecto de los valores de desarrollo (`5173:80` y `8001:8000`) del `docker-compose.yml` del repositorio. Las integraciones DynamoDB y S3 están implementadas en `backend/app/aws_ext.py` y se activan por variables de entorno al desplegar en la nube; sin ellas la aplicación opera solo con SQLite.

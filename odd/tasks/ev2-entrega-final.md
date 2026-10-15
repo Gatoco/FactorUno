@@ -30,8 +30,8 @@
 | T7 | Tests integrales + rendimiento + resultados documentados | S4, S5 | inline | ✅ hecho |
 | T8 | Docs seguridad: STRIDE, políticas authn/authz, estándares | S2, S3 | inline | ✅ hecho |
 | T9 | DynamoDB + S3: integración + ejemplo funcional | S6 | inline | ✅ hecho |
-| T10 | README/help + commits work-unit + push | S3 | inline | ⬜ |
-| T11 | Informe Ev2 ensamblado (rúbrica como títulos, gráficos) | S7, S8 + todo | inline | ⬜ |
+| T10 | README/help + commits work-unit + push | S3 | inline | ✅ hecho |
+| T11 | Informe Ev2 ensamblado (rúbrica como títulos, gráficos) | S7, S8 + todo | inline | ✅ hecho |
 | T12 | Documento único de entrega con links | S9 | inline | ⬜ |
 | T13 | Re-despliegue AWS + verificación pública + datos (EIP/correo) | S9 | inline | ⬜ |
 | T14 | Video demo | S9 | **usuario** | ⬜ |
@@ -43,3 +43,7 @@
 **L2 (2026-10-15, exploración AAI):** Tarea Ev2 (id 1501167) en AAI: entrega bajo **Grupo t420**; Moodle sin fecha límite configurada y sin envío online (confirmar canal con el profe). Rúbrica oficial completa (con niveles Destacado/Habilitado/En desarrollo/No logrado) extraída y guardada en el vault: `Ev2 — Rúbrica oficial (AAI).md`. Capturas en `Evidencias AAI/`. AWS: lab desmontado ayer; re-despliegue reproducible en ~5 min con `inacap_aai/scripts/userdata.sh`. Prioridad: Seguridad 30 pts → Pruebas 20 pts → no estructurada 5 → planificación/arquitectura 20 → informe → entrega → nube.
 
 **L3 (2026-10-15, evidencia de ejecución T2–T9):** Tests: **98 passed** (62 reglas + 16 auth + 9 servicio + 8 aws_ext + 3 rendimiento), cobertura **96%** (`pytest --cov=app --cov-report=term-missing`). Rendimiento 500 filas: carga CSV 0,11 s · listado 0,03 s · cálculo 0,004 s. Auth: bcrypt + JWT HS256 (secreto por env), roles admin/analista/consulta con matriz en API y UI; auditoría con usuario real; login UI compilado (vite build OK). Hardening: CORS por env, headers de seguridad + CSP en nginx, `.env.example`, `.env` en `.gitignore`. AWS: `aws_ext.py` — espejo de auditoría a DynamoDB y exportes JSON/CSV a S3 con URL firmada; degradación limpia sin variables de entorno (503 en `/api/exportar` sin bucket). Docs: `docs/informe/01-planificacion.md`, `02-arquitectura.md`; `docs/seguridad/01-amenazas-y-mitigacion.md`, `02-codificacion-segura.md`. Archivos: `backend/app/auth.py`, `aws_ext.py`, `backend/tests/` (5 archivos), `frontend/src/{api.js,App.jsx,styles.css}`.
+
+**L4 (2026-10-15, evidencia T10):** Commits work-unit en `main`: `83f965b` test suite (98 pruebas, 96 %) → `5d0f286` feat(security) auth+hardening+AWS → `eac3d6d` docs (informe + seguridad + ODD). Push `d2078c0..eac3d6d`. README: credenciales demo, sección Pruebas, stack actualizado. Validación local E2E: uvicorn 127.0.0.1:8000 + vite 5173; sin token → 401; login 3 roles; 7 capturas Playwright (login, grilla, detalle, auditoría, ingreso, montos, móvil) en `docs/informe/img/`. Docker local no disponible (daemon apagado, sin sudo): `docker compose config -q` OK; build completo se valida en el despliegue AWS.
+
+**L5 (2026-10-15, evidencia T11):** Informe ensamblado `docs/informe/00-informe-ev2.md` (portada grupo t420 → solo Benjamín visible en AAI · introducción · índice con los 14 criterios evaluables · secciones 2.1.1–2.1.6 + anexo seguridad 2.1.5.11/12). 12 diagramas Mermaid renderizados a PNG (mermaid-cli) e incrustados; PDF final `FactorUno-Informe-Ev2.pdf` (42 págs, Letter, pandoc → chromium). Pendientes declarados en el informe: 2.1.3.7 retroalimentación — instrumento incluido, resultados de encuesta se anexan al cierre; 2.1.6.15 oral fuera de documento por diseño.
