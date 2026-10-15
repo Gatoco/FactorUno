@@ -16,16 +16,29 @@ from jwt.exceptions import PyJWTError
 
 from .db import get_conn
 
-SECRET = os.environ.get("FACTORUNO_SECRET", "dev-secret-cambiar-en-produccion")
+SECRET = os.environ.get("FACTORUNO_SECRET", "")
+if not SECRET:
+    raise RuntimeError(
+        "FACTORUNO_SECRET debe estar definido (clave HS256 para los tokens JWT); "
+        "no hay valor por defecto. Genera uno con 'openssl rand -hex 32' "
+        "y exportalo antes de iniciar el servicio."
+    )
 ALGORITHM = "HS256"
 TOKEN_HORAS = int(os.environ.get("FACTORUNO_TOKEN_HORAS", "8"))
 
-# usuario -> (variable de entorno para su password, valor por defecto de desarrollo)
+# usuario -> variable de entorno que debe contener su password al sembrar.
+# Sin valores por defecto publicados: sin la variable, el usuario no se crea.
 USUARIOS_SEED = {
-    "admin": ("FACTORUNO_ADMIN_PASSWORD", "Admin1234!"),
-    "analista": ("FACTORUNO_ANALISTA_PASSWORD", "Analista1234!"),
-    "consulta": ("FACTORUNO_CONSULTA_PASSWORD", "Consulta1234!"),
+    "admin": "FACTORUNO_ADMIN_PASSWORD",
+    "analista": "FACTORUNO_ANALISTA_PASSWORD",
+    "consulta": "FACTORUNO_CONSULTA_PASSWORD",
 }
+
+
+def seed_demo_activo() -> bool:
+    """Indica si el sembrado de usuarios demo esta habilitado (FACTORUNO_SEED_DEMO)."""
+    valor = os.environ.get("FACTORUNO_SEED_DEMO", "")
+    return valor.strip().lower() in ("1", "true", "si", "sí")
 
 _bearer = HTTPBearer(auto_error=False)
 

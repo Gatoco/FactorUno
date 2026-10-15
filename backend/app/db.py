@@ -1,6 +1,7 @@
 """SQLite schema and connection helpers."""
 import os
 import sqlite3
+import threading
 from pathlib import Path
 
 DB_PATH = Path(__file__).resolve().parent.parent / "data" / "mantenedor.db"
@@ -75,14 +76,22 @@ def get_conn() -> sqlite3.Connection:
 
 
 def _seed_usuarios(conn: sqlite3.Connection) -> None:
-    """Crea los usuarios base (admin/analista/consulta) si la tabla esta vacia."""
+    """Crea los usuarios base solo si FACTORUNO_SEED_DEMO esta activo.
+
+    No hay passwords por defecto publicados: cada usuario se crea unicamente
+    si su variable de entorno (FACTORUNO_*_PASSWORD) esta definida.
+    """
     from . import auth  # import tardio: auth importa get_conn de este modulo
 
+    if not auth.seed_demo_activo():
+        return
     total = conn.execute("SELECT COUNT(*) FROM usuarios").fetchone()[0]
     if total:
         return
-    for usuario, (env_var, default) in auth.USUARIOS_SEED.items():
-        password = os.environ.get(env_var, default)
+    for usuario, env_var in auth.USUARIOS_SEED.items():
+        password = os.environ.get(env_var, "")
+        if not password:
+            continue
         conn.execute(
             "INSERT INTO usuarios (usuario, password_hash, rol) VALUES (?,?,?)",
             (usuario, auth.hash_password(password), usuario),
@@ -95,25 +104,50 @@ def init_db() -> None:
         _seed_usuarios(conn)
 
 
+_ESPEJO_LOCK = threading.Lock()
+_ESPEJO_PENDIENTE: list[dict] = []
+
+
 def audit(conn: sqlite3.Connection, accion: str, registro_id: int | None,
           detalle: str, usuario: str = "corredor") -> None:
     cur = conn.execute(
         "INSERT INTO auditoria (accion, registro_id, detalle, usuario) VALUES (?,?,?,?)",
         (accion, registro_id, detalle, usuario),
     )
-    # Espejo best-effort a DynamoDB (rúbrica 2.1.4.9); no-op sin tabla configurada.
-    try:
-        from . import aws_ext
+    # Espejo a DynamoDB (rúbrica 2.1.4.9): el evento se encola y se envia
+    # recien despues del commit (espejar_pendientes), nunca con la
+    # transaccion SQLite abierta (evita retener el write lock por red).
+    from . import aws_ext
 
+    if aws_ext.tabla_auditoria():
         fila = conn.execute(
             "SELECT fecha FROM auditoria WHERE id=?", (cur.lastrowid,)
         ).fetchone()
-        aws_ext.espejar_auditoria({
-            "accion": accion,
-            "registro_id": registro_id,
-            "detalle": detalle,
-            "usuario": usuario,
-            "fecha": fila["fecha"] if fila else "",
-        })
+        with _ESPEJO_LOCK:
+            _ESPEJO_PENDIENTE.append({
+                "accion": accion,
+                "registro_id": registro_id,
+                "detalle": detalle,
+                "usuario": usuario,
+                "fecha": fila["fecha"] if fila else "",
+            })
+
+
+def espejar_pendientes() -> None:
+    """Envia a DynamoDB los eventos de auditoria encolados (best-effort).
+
+    Llamar despues del commit de la transaccion local; un fallo del espejo
+    no revierte ni interrumpe la operacion ya confirmada en SQLite.
+    """
+    with _ESPEJO_LOCK:
+        pendientes = list(_ESPEJO_PENDIENTE)
+        _ESPEJO_PENDIENTE.clear()
+    if not pendientes:
+        return
+    try:
+        from . import aws_ext
+
+        for evento in pendientes:
+            aws_ext.espejar_auditoria(evento)
     except Exception:
         pass

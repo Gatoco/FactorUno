@@ -6,7 +6,7 @@ import sqlite3
 from datetime import datetime
 
 from . import reglas
-from .db import get_conn, audit
+from .db import get_conn, audit, espejar_pendientes
 
 
 def _fila_a_dict(fila: sqlite3.Row) -> dict:
@@ -84,6 +84,7 @@ def crear_calificacion(data: dict, fuente: str = "manual",
         rid = _insertar_calificacion(conn, data, fuente)
         audit(conn, "INSERT", rid, f"{data['mercado']} {data['instrumento']} ej{data['ejercicio']}",
               usuario)
+    espejar_pendientes()
     return obtener_calificacion(rid)
 
 
@@ -114,6 +115,7 @@ def modificar_calificacion(registro_id: int, data: dict,
             for c, v in factores.items():
                 conn.execute("INSERT OR REPLACE INTO factores VALUES (?,?,?)", (registro_id, int(c), v))
         audit(conn, "UPDATE", registro_id, f"modificacion id={registro_id}", usuario)
+    espejar_pendientes()
     return obtener_calificacion(registro_id)
 
 
@@ -124,6 +126,7 @@ def eliminar_calificacion(registro_id: int, usuario: str = "corredor") -> bool:
             return False
         conn.execute("DELETE FROM calificaciones WHERE id=?", (registro_id,))
         audit(conn, "DELETE", registro_id, f"eliminacion id={registro_id}", usuario)
+    espejar_pendientes()
     return True
 
 
@@ -140,6 +143,7 @@ def calcular_por_registro(registro_id: int, usuario: str = "corredor") -> dict |
         for c, v in factores.items():
             conn.execute("INSERT OR REPLACE INTO factores VALUES (?,?,?)", (registro_id, int(c), v))
         audit(conn, "CALCULAR", registro_id, "recalculo de factores", usuario)
+    espejar_pendientes()
     return obtener_calificacion(registro_id)
 
 
@@ -200,6 +204,7 @@ def cargar_csv(texto: str, tipo: str = "montos", usuario: str = "corredor") -> d
                 llave_existente[llave] = rid
                 audit(conn, "CARGA", rid, f"insertado (csv {tipo}) fila {i}", usuario)
                 insertados += 1
+    espejar_pendientes()
     return {"insertados": insertados, "actualizados": actualizados, "errores": errores}
 
 
