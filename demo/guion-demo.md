@@ -6,10 +6,32 @@
 ## Antes de grabar
 
 - [ ] Abrir `http://100.57.30.193/`. Si no carga, el laboratorio está apagado: avisar y esperar.
-- [ ] Usuario `admin` / `Admin1234!` (tomas 1 a 9). Solo la toma 10 usa `analista` / `Analista1234!`.
+- [ ] Usuario `admin` / `Admin1234!` (tomas 1 a 10). Solo la toma 11 usa `analista` / `Analista1234!`.
 - [ ] Tener a mano los dos archivos: `carga-montos-demo-error.csv` y `carga-montos-demo.csv`.
 - [ ] Cerrar notificaciones y pestañas. Grabar en 1080p con la cámara a la vista.
 - [ ] Si algo se traba: se corta y se repite esa toma.
+
+<div style="page-break-after: always;"></div>
+
+## Los conceptos, en una línea cada uno
+
+Esta página es solo para preparar la grabación: no se lee en cámara.
+
+| Dato | Qué es | Ejemplo de la demo |
+|---|---|---|
+| Ejercicio | El año comercial al que pertenece el dividendo. | 2024 |
+| Mercado | Dónde se transó el instrumento: **ACN** acciones, **CFI** cuotas de fondos de inversión, **FM** fondos mutuos. | ACN |
+| Instrumento | Quién pagó el dividendo: la empresa o el fondo. | ENEL AMERICAS S.A. |
+| Fecha de pago | El día en que se pagó el dividendo (formato AAAA-MM-DD). | 2024-05-09 |
+| Secuencia | Cuántos dividendos pagó ese instrumento en el año (1 = el primero). | 2 |
+| N° de dividendo | El número de dividendo que trae el certificado del SII. | 880 |
+| Tipo de sociedad | **A** = sociedad anónima abierta (cotiza en bolsa) · **C** = cerrada. | A |
+| Valor histórico | El monto del dividendo, según el certificado. | 640000 |
+| Montos (columnas 8 a 37) | El desglose del certificado DJ 1948 por tipo de renta y crédito. Cada grupo que aparece bajo el campo es un concepto de la homologación del SII. | col. 8 = 200000 |
+| Suma de la base (8 a 19) | Los montos de esas columnas sumados: es la base del cálculo y no puede pasar de 1. | 320000 |
+| Factores | Cada monto dividido por la base. Los calcula el sistema. | 200000 ÷ 320000 = 0,625 |
+
+**En resumen:** el certificado dice cuánto se pagó y en qué columnas; la aplicación calcula qué parte de ese dividendo corresponde a cada concepto, deja la trazabilidad y genera el respaldo.
 
 <div style="page-break-after: always;"></div>
 
@@ -19,21 +41,71 @@
 
 **Decir:** "Esta es la aplicación que desarrollé para el caso de FactorUno, que sale del HDU de nuam: registrar la calificación de los dividendos del ejercicio 2024, con sus factores, la trazabilidad y el respaldo. Ya está publicada en la nube, así que la abro directo."
 
-**Ver:** la pantalla de login y después la grilla con los registros ya cargados.
+**Ver:** la pantalla de login y después la grilla con los certificados del período.
 
 <div style="page-break-after: always;"></div>
 
-## Toma 2 — Filtrar la grilla
+## Toma 2 — La grilla y sus filtros
+
+**Hacer:** pasar el mouse por la tabla y por los filtros, sin apretar nada.
+
+**Decir:** "La grilla lista los certificados cargados, con una fila por dividendo y una columna por concepto. Arriba se filtra por mercado, origen y período comercial."
+
+**Ver:** la tabla y, por fila, los botones **Ver**, **Modificar** y **Eliminar**; arriba, los botones **Ingresar**, **Carga de calificaciones** y **Exportar**.
+
+<div style="page-break-after: always;"></div>
+
+## Toma 3 — Llega el archivo y el sistema lo revisa antes de grabar
+
+**Hacer:** botón **Carga de calificaciones** → Tipo de carga `Montos (DJ 1948)` → Archivo → elegir `carga-montos-demo-error.csv`.
+
+**Decir:** "Este archivo tiene errores a propósito, para mostrar la validación. Antes de grabar, el sistema lo previsualiza: dice cuántos registros trae y qué línea está mal."
+
+**Ver:** la vista previa con 3 registros y la lista de avisos (fecha inválida, una fila con columnas de menos, tipo de sociedad inválido). Apretar **Cancelar**.
+
+<div style="page-break-after: always;"></div>
+
+## Toma 4 — Cargar el lote de certificados
+
+**Hacer:** botón **Carga de calificaciones** → Tipo de carga `Montos (DJ 1948)` → Archivo → elegir `carga-montos-demo.csv` → botón **Confirmar carga (3)**.
+
+**Decir:** "Ahora el mismo formato con datos válidos: tres certificados identificados por llave, así la carga actualiza en vez de duplicar."
+
+**Ver:** el mensaje "Carga OK: 3 insertados" y los 3 registros en la grilla.
+
+<div style="page-break-after: always;"></div>
+
+## Toma 5 — Filtrar por mercado
 
 **Hacer:** en **Mercado** elegir `ACN` y apretar **Buscar**.
 
-**Decir:** "La grilla lista lo ya cargado y se filtra por mercado, origen y período comercial."
+**Decir:** "Filtro por mercado: quedan solo los dos certificados de acciones que acabo de cargar."
 
-**Ver:** la tabla con menos filas: solo las del mercado elegido.
+**Ver:** la tabla con 2 filas: `CENCOSUD S.A.` y `ENEL AMERICAS S.A.`.
 
 <div style="page-break-after: always;"></div>
 
-## Toma 3 — Registrar el certificado que llegó hoy
+## Toma 6 — Ver el cálculo que hace el sistema
+
+**Hacer:** abrir el registro `ENEL AMERICAS S.A.` → botón **Detalle** → botón **Calcular factores**.
+
+**Decir:** "El sistema divide cada monto por la base 8 a 19: 0,625 y 0,375. Así se reparte la base del dividendo."
+
+**Ver:** en el detalle, monto y factor por columna: columna 8 → `200000` / `0,625` y columna 12 → `120000` / `0,375`.
+
+<div style="page-break-after: always;"></div>
+
+## Toma 7 — Corregir un error de tipeo
+
+**Hacer:** abrir el registro `ENEL AMERICAS S.A.` en edición → pestaña **Factores** → en la columna 8 escribir `0.7` → después corregirlo a `0.625`.
+
+**Decir:** "Si me equivoco, la suma se calcula en vivo y me avisa antes de grabar."
+
+**Ver:** el recuadro de suma en rojo con "¡supera 1!"; al corregirlo, vuelve a 1 con "(≤ 1 ✓)". Cerrar con **Cancelar**.
+
+<div style="page-break-after: always;"></div>
+
+## Toma 8 — Registrar a mano un certificado que no vino en el lote
 
 **Hacer:** botón **Ingresar** → pestaña **Datos básicos**.
 
@@ -44,63 +116,23 @@ Ejercicio `2024` · Mercado `CFI` · Instrumento `AGUAS ANDINAS S.A.` · Fecha d
 
 **Escribir (Montos):** columna 8 = `150000` · columna 12 = `50000`. Todo lo demás queda en 0.
 
-**Decir:** "Registro un certificado como ejemplo. Los montos van agrupados por concepto de la homologación del SII."
+**Decir:** "Cuando llega un certificado suelto, lo ingreso a mano. Los montos van agrupados por concepto de la homologación del SII."
 
 **Ver:** el mensaje de guardado y el registro nuevo en la grilla.
 
 <div style="page-break-after: always;"></div>
 
-## Toma 4 — Ver el cálculo que hace el sistema
-
-**Hacer:** en la grilla apretar **Buscar** para refrescar → abrir el registro `AGUAS ANDINAS S.A.` → botón **Detalle** → botón **Calcular factores**.
-
-**Decir:** "El sistema divide cada monto por la base 8 a 19: 0,75 y 0,25. Así se reparte la base del dividendo."
-
-**Ver:** en el detalle, monto y factor por columna: columna 8 → `150000` / `0,75` y columna 12 → `50000` / `0,25`.
-
-<div style="page-break-after: always;"></div>
-
-## Toma 5 — Corregir un error de tipeo
-
-**Hacer:** abrir el registro `AGUAS ANDINAS S.A.` en edición → pestaña **Factores** → en la columna 8 escribir `0.8` → después corregirlo a `0.75`.
-
-**Decir:** "Si me equivoco, la suma se calcula en vivo y me avisa antes de grabar."
-
-**Ver:** el recuadro de suma en rojo con "¡supera 1!"; al corregirlo, vuelve a 1 con "(≤ 1 ✓)". Cerrar con **Cancelar**.
-
-<div style="page-break-after: always;"></div>
-
-## Toma 6 — Auditoría
+## Toma 9 — Auditoría
 
 **Hacer:** pestaña **Auditoría**.
 
-**Decir:** "Cada ingreso, modificación o eliminación queda auditado con usuario, fecha y hora."
+**Decir:** "Cada ingreso, modificación o eliminación queda auditado con usuario, fecha y hora, y además se replica en la base de datos en la nube."
 
 **Ver:** la tabla con el registro del ingreso recién hecho y el usuario `admin`.
 
 <div style="page-break-after: always;"></div>
 
-## Toma 7 — Previsualizar un archivo con errores
-
-**Hacer:** botón **Carga de calificaciones** → Tipo de carga `Montos (DJ 1948)` → Archivo → elegir `carga-montos-demo-error.csv`.
-
-**Decir:** "Este archivo tiene errores a propósito, para mostrar la validación. Antes de grabar, el sistema lo previsualiza: dice cuántos registros trae y qué línea está mal."
-
-**Ver:** la vista previa con 3 registros y la lista de avisos (fecha inválida, una fila con columnas de menos, tipo de sociedad inválido). Apretar **Cancelar**.
-
-<div style="page-break-after: always;"></div>
-
-## Toma 8 — Cargar un lote de certificados
-
-**Hacer:** botón **Carga de calificaciones** → Tipo de carga `Montos (DJ 1948)` → Archivo → elegir `carga-montos-demo.csv` → botón **Confirmar carga (3)**.
-
-**Decir:** "Ahora el mismo formato con datos válidos: tres certificados identificados por llave, así la carga actualiza en vez de duplicar."
-
-**Ver:** el mensaje "Carga OK: 3 insertados" y los 3 registros nuevos en la grilla.
-
-<div style="page-break-after: always;"></div>
-
-## Toma 9 — Exportar el respaldo
+## Toma 10 — Exportar el respaldo
 
 **Hacer:** botón **Exportar** → **JSON**.
 
@@ -110,7 +142,7 @@ Ejercicio `2024` · Mercado `CFI` · Instrumento `AGUAS ANDINAS S.A.` · Fecha d
 
 <div style="page-break-after: always;"></div>
 
-## Toma 10 — Cierre en el teléfono
+## Toma 11 — Cierre en el teléfono
 
 **Hacer:** **Salir** → entrar con `analista` / `Analista1234!` → achicar la ventana hasta unos 390 px de ancho (o abrir la misma dirección en el teléfono).
 
@@ -124,9 +156,10 @@ Ejercicio `2024` · Mercado `CFI` · Instrumento `AGUAS ANDINAS S.A.` · Fecha d
 
 | Síntoma | Qué hacer |
 |---|---|
-| El paso 3 guarda pero la grilla no muestra el registro | Apretar **Buscar** para refrescar la lista. |
-| El CSV dice "0 insertados, 3 actualizados" | Es una segunda toma: ya estaba cargado. La carga actualiza por llave; sirve igual. |
-| El paso 3 dice que actualizó en vez de insertar | Ese certificado ya existía: cambiar el N° de dividendo a `1451`. |
+| El paso 8 guarda pero la grilla no muestra el registro | Apretar **Buscar** para refrescar la lista. |
+| La toma 4 dice "0 insertados, 3 actualizados" | Ya cargaste el lote antes: la carga actualiza por llave. Sirve igual para la demo. |
+| La toma 5 muestra menos filas de las esperadas | El lote ya no está completo: volver a cargar `carga-montos-demo.csv`. |
+| La toma 8 dice que actualizó en vez de insertar | Ese certificado ya existía: cambiar el N° de dividendo a `1451`. |
 | **Exportar** muestra error | La nube no está configurada en ese entorno. En el servidor de la demo sí funciona. |
 | La página no responde | El laboratorio se apagó o cambió de IP. Revisar antes de grabar. |
 | El login con `admin` falla | Probar `analista` con `Analista1234!` y seguir. |
