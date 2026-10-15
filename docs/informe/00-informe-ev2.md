@@ -337,8 +337,8 @@ Las siguientes capturas corresponden a la aplicación ejecutándose:
 
 La interfaz aplica un **sistema de diseño único** en todas las vistas, lo que garantiza consistencia visual:
 
-- **Tipografía**: una sola familia tipográfica con jerarquías claras (título, subtítulo, cuerpo, dato).
-- **Paleta**: un color primario para acciones, gris neutro para fondos y estructura, rojo solo para acciones destructivas (eliminar), verde/neutro para estados.
+- **Tipografía**: pareja tipográfica deliberada — serif editorial (Georgia) para títulos y jerarquías, tipografía de sistema para cuerpo y datos; números tabulares alineados en grillas y modales.
+- **Paleta**: azul institucional como color primario de acciones, rojo institucional como acento de marca (borde superior, pestaña activa, numerales de columnas) y para acciones destructivas, fondo crema de papel, verde para estados correctos y grises neutros para estructura.
 - **Componentes reutilizables**: botones, tarjetas, modales (detalle, ingreso, montos), tablas y pestañas mantienen el mismo aspecto y comportamiento en toda la aplicación.
 - **Retroalimentación**: mensajes de error del backend se muestran al usuario sin ambigüedad (por ejemplo, al intentar ingresar sin sesión o al enviar datos inválidos).
 
@@ -347,7 +347,7 @@ La **adaptabilidad** está resuelta con una hoja de estilos responsiva: la barra
 | Aspecto | Criterio aplicado | Evidencia |
 |---------|-------------------|-----------|
 | Consistencia tipográfica | Jerarquías únicas en todas las vistas | Capturas 1–6 |
-| Consistencia de color | Paleta única, rojo solo para acciones destructivas | Capturas 2, 3, 6 |
+| Consistencia de color | Paleta institucional única (azul primario, rojo de acento, fondo crema) en todas las vistas | Capturas 2, 3, 6 |
 | Consistencia de componentes | Modales, tablas y botones homogéneos | Capturas 3, 5, 6 |
 | Adaptabilidad | Layout responsivo usable en móvil | Captura 7 |
 
