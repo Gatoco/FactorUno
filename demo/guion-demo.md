@@ -41,7 +41,7 @@ Esta página es solo para preparar la grabación: no se lee en cámara.
 
 **Decir:** "Esta es la aplicación que desarrollé para el caso de FactorUno, que sale del HDU de nuam: registrar la calificación de los dividendos del ejercicio 2024, con sus factores, la trazabilidad y el respaldo. Ya está publicada en la nube, así que la abro directo."
 
-**Ver:** la pantalla de login y después la grilla con los certificados del período.
+**Ver:** la pantalla de login y, al entrar, la grilla (todavía vacía: los certificados se cargan en la toma 4).
 
 <div style="page-break-after: always;"></div>
 
@@ -49,9 +49,9 @@ Esta página es solo para preparar la grabación: no se lee en cámara.
 
 **Hacer:** pasar el mouse por la tabla y por los filtros, sin apretar nada.
 
-**Decir:** "La grilla lista los certificados cargados, con una fila por dividendo y una columna por concepto. Arriba se filtra por mercado, origen y período comercial."
+**Decir:** "La grilla lista los certificados del período y parte vacía: los cargo en un momento. Arriba se filtra por mercado, origen y período comercial."
 
-**Ver:** la tabla y, por fila, los botones **Ver**, **Modificar** y **Eliminar**; arriba, los botones **Ingresar**, **Carga de calificaciones** y **Exportar**.
+**Ver:** el mensaje "Sin calificaciones. Usa «Ingresar» o carga un CSV."; los filtros con **Buscar** y **Limpiar**; y la barra con **Ingresar**, **Carga de calificaciones** y **Exportar**. Con datos, cada fila muestra **Ver**, **Modificar** y **Eliminar**.
 
 <div style="page-break-after: always;"></div>
 
@@ -91,7 +91,7 @@ Esta página es solo para preparar la grabación: no se lee en cámara.
 
 **Decir:** "El sistema divide cada monto por la base 8 a 19: 0,625 y 0,375. Así se reparte la base del dividendo."
 
-**Ver:** en el detalle, monto y factor por columna: columna 8 → `200000` / `0,625` y columna 12 → `120000` / `0,375`.
+**Ver:** en el detalle, monto y factor por columna: columna 8 → `200.000` / `0.625` y columna 12 → `120.000` / `0.375` (el factor se muestra con punto decimal).
 
 <div style="page-break-after: always;"></div>
 
@@ -118,7 +118,7 @@ Ejercicio `2024` · Mercado `CFI` · Instrumento `AGUAS ANDINAS S.A.` · Fecha d
 
 **Decir:** "Cuando llega un certificado suelto, lo ingreso a mano. Los montos van agrupados por concepto de la homologación del SII."
 
-**Ver:** el mensaje de guardado y el registro nuevo en la grilla.
+**Ver:** el mensaje de guardado; después apretar **Limpiar** para refrescar la lista y ver `AGUAS ANDINAS S.A.` junto a los otros tres.
 
 <div style="page-break-after: always;"></div>
 
@@ -156,7 +156,7 @@ Ejercicio `2024` · Mercado `CFI` · Instrumento `AGUAS ANDINAS S.A.` · Fecha d
 
 | Síntoma | Qué hacer |
 |---|---|
-| El paso 8 guarda pero la grilla no muestra el registro | Apretar **Buscar** para refrescar la lista. |
+| El paso 8 guarda pero la grilla no muestra el registro | Apretar **Limpiar** o **Buscar** para refrescar la lista. |
 | La toma 4 dice "0 insertados, 3 actualizados" | Ya cargaste el lote antes: la carga actualiza por llave. Sirve igual para la demo. |
 | La toma 5 muestra menos filas de las esperadas | El lote ya no está completo: volver a cargar `carga-montos-demo.csv`. |
 | La toma 8 dice que actualizó en vez de insertar | Ese certificado ya existía: cambiar el N° de dividendo a `1451`. |
