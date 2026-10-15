@@ -61,6 +61,7 @@ export const api = {
   eliminar: (id) => request(`/calificaciones/${id}`, { method: 'DELETE' }),
   calcular: (id) => request(`/calificaciones/${id}/calcular`, { method: 'POST' }),
   auditoria: () => request('/auditoria'),
+  exportar: (formato) => request(`/exportar?formato=${formato}`),
   cargar: async (archivo, tipo) => {
     const fd = new FormData()
     fd.append('archivo', archivo)

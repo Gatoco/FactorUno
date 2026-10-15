@@ -268,6 +268,52 @@ input:focus, select:focus {
   .modal { padding: 3vh 10px; }
 }
 
+/* ---------- Detalle de columna: grupo de homologación ---------- */
+.col-campo .grupo {
+  display: block; font-style: normal; font-weight: 400; color: var(--tinta-3); font-size: 10px;
+  letter-spacing: .01em; line-height: 1.35; margin-top: 1px;
+}
+
+/* ---------- Resumen de suma: variante de incumplimiento ---------- */
+.resumen.mal { background: var(--rojo-bg); border-color: #eec7c7; }
+
+/* ---------- Previsualización de la carga ---------- */
+.previa {
+  border: 1px solid var(--linea); border-radius: 8px; overflow: auto; max-height: 210px; background: var(--papel-2);
+}
+.previa table { border-collapse: collapse; width: 100%; font-size: 12px; }
+.previa th, .previa td { padding: 5px 8px; border-bottom: 1px solid #efece3; text-align: left; white-space: nowrap; }
+.previa th {
+  position: sticky; top: 0; background: #f2efe7; font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .05em; color: var(--tinta-2);
+}
+.previa tbody tr:nth-child(even) td { background: var(--blanco); }
+.errores-csv { font-size: 12px; color: var(--rojo); margin: 6px 0 0; padding-left: 18px; }
+.previa-caja { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.previa-caja .nota { margin: 0; }
+
+/* ---------- Móvil: la grilla se convierte en tarjetas ---------- */
+@media (max-width: 560px) {
+  .tabla-marco { overflow: visible; max-height: none; background: transparent; border: 0; box-shadow: none; }
+  .grilla thead { display: none; }
+  .grilla tbody tr {
+    display: block; background: var(--blanco); border: 1px solid var(--linea); border-left: 3px solid var(--rojo);
+    border-radius: var(--radio); box-shadow: var(--sombra-1); padding: 8px 12px 10px; margin-bottom: 10px;
+  }
+  .grilla tbody tr:nth-child(even) td, .grilla tbody tr:hover td { background: transparent; }
+  .grilla tbody td {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+    padding: 5px 0; border-bottom: 1px solid #efece3; text-align: right;
+  }
+  .grilla tbody tr td:last-child { border-bottom: 0; }
+  .grilla tbody td[data-l]::before {
+    content: attr(data-l); flex: 0 0 40%; text-align: left; font-size: 10px; font-weight: 700;
+    letter-spacing: .05em; text-transform: uppercase; color: var(--tinta-3);
+  }
+  .grilla tbody td.centro { display: block; text-align: center; }
+  .grilla tbody td.acciones { justify-content: flex-end; padding-top: 8px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }

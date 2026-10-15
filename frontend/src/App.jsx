@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api, getToken, guardarSesion, limpiarSesion } from './api.js'
-import { LABELS, MONTOS_COLS, BASE_COLS, formatFecha, sumaBase } from './columnas.js'
+import { LABELS, MONTOS_COLS, BASE_COLS, formatFecha, sumaBase, grupoDe } from './columnas.js'
 import './styles.css'
 
 const vacia = () => ({
@@ -94,6 +94,7 @@ export default function App() {
             <div className="toolbar">
               <button className="btn prim" onClick={() => setModal({ modo: 'crear', form: vacia() })}>Ingresar</button>
               <CargaCsv onResultado={(r) => { cargar(); mostrarAviso(`Carga OK: ${r.insertados} insertados, ${r.actualizados} actualizados${r.errores?.length ? `, ${r.errores.length} errores` : ''}`) }} />
+              <Exportar onAviso={mostrarAviso} />
             </div>
           )}
           <div className="tabla-marco">
@@ -110,12 +111,12 @@ export default function App() {
               {!cargando && filas.length === 0 && <tr><td colSpan={11} className="centro">Sin calificaciones. Usa «Ingresar» o carga un CSV.</td></tr>}
               {filas.map((f) => (
                 <tr key={f.id}>
-                  <td className="num">{f.ejercicio}</td><td>{f.mercado}</td><td>{f.instrumento}</td>
-                  <td className="num">{formatFecha(f.fecha_pago)}</td><td className="num">{f.secuencia}</td><td className="num">{f.numero_dividendo}</td>
-                  <td><span className={f.tipo_sociedad === 'A' ? 'tag tag-a' : 'tag tag-c'} title={f.tipo_sociedad === 'A' ? 'Sociedad abierta' : 'Sociedad cerrada'}>{f.tipo_sociedad}</span></td>
-                  <td>{f.isfut ? <span className="tag tag-ok">Sí</span> : <span className="vacio">—</span>}</td>
-                  <td className="dim">{f.origen}</td><td className="dim">{f.fuente}</td>
-                  <td className="acciones">
+                  <td data-l="Ejercicio" className="num">{f.ejercicio}</td><td data-l="Mercado">{f.mercado}</td><td data-l="Instrumento">{f.instrumento}</td>
+                  <td data-l="Fecha pago" className="num">{formatFecha(f.fecha_pago)}</td><td data-l="Secuencia" className="num">{f.secuencia}</td><td data-l="N° dividendo" className="num">{f.numero_dividendo}</td>
+                  <td data-l="Tipo soc."><span className={f.tipo_sociedad === 'A' ? 'tag tag-a' : 'tag tag-c'} title={f.tipo_sociedad === 'A' ? 'Sociedad abierta' : 'Sociedad cerrada'}>{f.tipo_sociedad}</span></td>
+                  <td data-l="ISFUT">{f.isfut ? <span className="tag tag-ok">Sí</span> : <span className="vacio">—</span>}</td>
+                  <td data-l="Origen" className="dim">{f.origen}</td><td data-l="Fuente" className="dim">{f.fuente}</td>
+                  <td data-l="Acciones" className="acciones">
                     <button onClick={async () => { setDetalle(await api.obtener(f.id)) }}>Ver</button>
                     {puedeEscribir && <button onClick={() => setModal({ modo: 'editar', id: f.id, form: convertirForm(f) })}>Modificar</button>}
                     {puedeEscribir && <button className="peligro" onClick={async () => { if (confirm(`¿Eliminar ${f.instrumento} ej.${f.ejercicio}?`)) { await api.eliminar(f.id); cargar(); mostrarAviso('Eliminada') } }}>Eliminar</button>}
@@ -175,18 +176,120 @@ function Filtros({ filtros, setFiltros, onBuscar }) {
   )
 }
 
-function CargaCsv({ onResultado }) {
-  const [tipo, setTipo] = useState('montos')
+// Campos base obligatorios del archivo de carga (hoja 3.1 Archivo de carga del HDU)
+const CAMPOS_BASE = ['ejercicio', 'mercado', 'instrumento', 'fecha', 'secuencia', 'numero_dividendo', 'tipo_sociedad']
+
+function analizarCsv(texto) {
+  const lineas = texto.split(/\r?\n/).filter((l) => l.trim() !== '')
+  if (!lineas.length) return { encabezado: [], filas: [], problemas: ['El archivo está vacío.'] }
+  const sep = (lineas[0].match(/;/g) || []).length > (lineas[0].match(/,/g) || []).length ? ';' : ','
+  const partir = (l) => l.split(sep).map((c) => c.trim().replace(/^"|"$/g, ''))
+  const encabezado = partir(lineas[0])
+  const filas = lineas.slice(1).map(partir)
+  const planas = encabezado.map((c) => c.toLowerCase())
+  const problemas = []
+  const faltantes = CAMPOS_BASE.filter((c) => !planas.some((h) => h.startsWith(c)))
+  if (faltantes.length) problemas.push(`Faltan columnas obligatorias: ${faltantes.join(', ')}.`)
+  const idxFecha = planas.findIndex((c) => c.startsWith('fecha'))
+  const idxTipo = planas.findIndex((c) => c.startsWith('tipo_sociedad'))
+  filas.forEach((f, i) => {
+    const linea = i + 2
+    if (f.length !== encabezado.length) { problemas.push(`Línea ${linea}: ${f.length} columnas contra ${encabezado.length} de la cabecera.`); return }
+    if (idxFecha >= 0 && !/^\d{4}-\d{2}-\d{2}/.test(f[idxFecha])) problemas.push(`Línea ${linea}: fecha «${f[idxFecha]}» no está en formato AAAA-MM-DD.`)
+    if (idxTipo >= 0 && !['A', 'C'].includes((f[idxTipo] || '').toUpperCase())) problemas.push(`Línea ${linea}: tipo de sociedad «${f[idxTipo]}» debe ser A o C.`)
+  })
+  return { encabezado, filas, problemas }
+}
+
+function ResumenSuma({ factores }) {
+  const suma = sumaBase(factores)
+  const excede = suma > 1 + 1e-8
+  return (
+    <div className={excede ? 'resumen mal' : 'resumen'}>
+      <strong>Suma factores 8–19: {suma.toFixed(8)}</strong>{' '}
+      {excede ? <span className="peligro-texto">¡supera 1!</span> : '(≤ 1 ✓)'}
+    </div>
+  )
+}
+
+function Exportar({ onAviso }) {
   const [abierto, setAbierto] = useState(false)
-  const [archivo, setArchivo] = useState(null)
-  const [msg, setMsg] = useState('')
+  const [enviando, setEnviando] = useState('')
+  const [resultado, setResultado] = useState(null)
+
+  async function exportar(formato) {
+    setEnviando(formato); setResultado(null)
+    try {
+      const r = await api.exportar(formato)
+      setResultado(r)
+      onAviso(`Respaldo ${r.clave} publicado en S3`)
+      if (r.url_firmada) window.open(r.url_firmada, '_blank', 'noopener')
+    } catch (e) { onAviso(e.message, true) } finally { setEnviando('') }
+  }
+
   return (
     <>
-      <button className="btn" onClick={() => setAbierto(!abierto)}>Carga de calificaciones</button>
+      <button className="btn" onClick={() => { setAbierto(!abierto); setResultado(null) }}>Exportar</button>
       {abierto && (
         <div className="modal" role="dialog" aria-modal="true">
           <div className="modal-caja">
             <button className="modal-x" aria-label="Cerrar" onClick={() => setAbierto(false)}>×</button>
+            <h2>Exportar respaldo</h2>
+            <p className="nota">Genera el respaldo completo de las calificaciones, lo publica en el bucket S3 del proyecto y devuelve una URL firmada válida por 1 hora. La descarga se abre en una pestaña nueva.</p>
+            <div className="modal-botones">
+              <button className="btn" onClick={() => setAbierto(false)}>Cerrar</button>
+              <button className="btn" disabled={!!enviando} onClick={() => exportar('csv')}>{enviando === 'csv' ? 'Generando…' : 'CSV'}</button>
+              <button className="btn prim" disabled={!!enviando} onClick={() => exportar('json')}>{enviando === 'json' ? 'Generando…' : 'JSON'}</button>
+            </div>
+            {resultado && (
+              <p className="aviso">
+                <strong>{resultado.clave}</strong> en el bucket <code>{resultado.bucket}</code>.{' '}
+                {resultado.url_firmada ? <a href={resultado.url_firmada} target="_blank" rel="noreferrer">Abrir URL firmada</a> : 'Sin URL firmada.'}
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+    </>
+  )
+}
+
+function CargaCsv({ onResultado }) {
+  const [tipo, setTipo] = useState('montos')
+  const [abierto, setAbierto] = useState(false)
+  const [archivo, setArchivo] = useState(null)
+  const [analisis, setAnalisis] = useState(null)
+  const [msg, setMsg] = useState('')
+
+  function elegir(e) {
+    const f = e.target.files?.[0] || null
+    setArchivo(f); setAnalisis(null); setMsg('')
+    if (!f) return
+    const lector = new FileReader()
+    lector.onload = () => setAnalisis(analizarCsv(String(lector.result || '')))
+    lector.onerror = () => setMsg('No se pudo leer el archivo.')
+    lector.readAsText(f)
+  }
+
+  function cerrar() { setAbierto(false); setArchivo(null); setAnalisis(null); setMsg(''); setTipo('montos') }
+
+  async function grabar() {
+    if (!archivo) { setMsg('Selecciona un archivo CSV'); return }
+    try {
+      const r = await api.cargar(archivo, tipo)
+      setMsg(`OK: ${r.insertados} insertados, ${r.actualizados} actualizados${r.errores?.length ? ` — errores: ${r.errores.join('; ')}` : ''}`)
+      onResultado(r); cerrar()
+    } catch (e) { setMsg(e.message) }
+  }
+
+  const columnas = analisis ? analisis.encabezado.slice(0, 7) : []
+  return (
+    <>
+      <button className="btn" onClick={() => (abierto ? cerrar() : setAbierto(true))}>Carga de calificaciones</button>
+      {abierto && (
+        <div className="modal" role="dialog" aria-modal="true">
+          <div className="modal-caja ancha">
+            <button className="modal-x" aria-label="Cerrar" onClick={cerrar}>×</button>
             <h2>Cargar archivo (CSV)</h2>
             <label>Tipo de carga
               <select value={tipo} onChange={(e) => setTipo(e.target.value)}>
@@ -195,20 +298,46 @@ function CargaCsv({ onResultado }) {
               </select>
             </label>
             <label>Archivo
-              <input type="file" accept=".csv" onChange={(e) => setArchivo(e.target.files[0])} />
+              <input type="file" accept=".csv" onChange={elegir} />
             </label>
+
+            {analisis && (
+              <div className="previa-caja">
+                <p className="nota">
+                  <strong>{analisis.filas.length}</strong> registros detectados · {analisis.encabezado.length} columnas ·{' '}
+                  {analisis.problemas.length === 0
+                    ? 'sin problemas de formato'
+                    : `${analisis.problemas.length} ${analisis.problemas.length === 1 ? 'aviso' : 'avisos'} de formato`}
+                </p>
+                {analisis.filas.length > 0 && (
+                  <div className="previa">
+                    <table>
+                      <thead><tr>{columnas.map((c) => <th key={c}>{c}</th>)}</tr></thead>
+                      <tbody>
+                        {analisis.filas.slice(0, 5).map((f, i) => (
+                          <tr key={i}>{columnas.map((_, j) => <td key={j}>{f[j]}</td>)}</tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+                {analisis.filas.length > 5 && <p className="nota">Vista previa de las primeras 5 filas de {analisis.filas.length}.</p>}
+                {analisis.problemas.length > 0 && (
+                  <ul className="errores-csv">
+                    {analisis.problemas.slice(0, 5).map((p, i) => <li key={i}>{p}</li>)}
+                    {analisis.problemas.length > 5 && <li>… y {analisis.problemas.length - 5} más.</li>}
+                  </ul>
+                )}
+              </div>
+            )}
+
             <p className="nota">Columnas: ejercicio, mercado, instrumento, fecha (YYYY-MM-DD), secuencia, numero_dividendo, tipo_sociedad (A/C), valor_historico, monto_8…monto_19 / factor_8…factor_37. Actualiza por llave si existe.</p>
             {msg && <p className="aviso">{msg}</p>}
             <div className="modal-botones">
-              <button className="btn" onClick={() => setAbierto(false)}>Cancelar</button>
-              <button className="btn prim" onClick={async () => {
-                if (!archivo) { setMsg('Selecciona un archivo CSV'); return }
-                try {
-                  const r = await api.cargar(archivo, tipo)
-                  setMsg(`OK: ${r.insertados} insertados, ${r.actualizados} actualizados${r.errores?.length ? ` — errores: ${r.errores.join('; ')}` : ''}`)
-                  onResultado(r); setAbierto(false)
-                } catch (e) { setMsg(e.message) }
-              }}>Grabar</button>
+              <button className="btn" onClick={cerrar}>Cancelar</button>
+              <button className="btn prim" disabled={!archivo} onClick={grabar}>
+                {analisis ? `Confirmar carga (${analisis.filas.length})` : 'Grabar'}
+              </button>
             </div>
           </div>
         </div>
@@ -282,25 +411,31 @@ function ModalCalificacion({ modal, onClose, onGuardado }) {
         )}
 
         {pestana === 'montos' && (
-          <div className="scroll-cols">
-            {MONTOS_COLS.map((c) => (
-              <label key={c} className="col-campo">
-                <span>{c}. {LABELS[c]}</span>
-                <input type="number" step="any" value={form.montos[c] ?? ''} onChange={(e) => setMonto(c, e.target.value)} />
-              </label>
-            ))}
-          </div>
+          <>
+            <p className="nota">Montos por columna del certificado del SII. Cada grupo corresponde a una categoría de la hoja de homologación del HDU.</p>
+            <div className="scroll-cols">
+              {MONTOS_COLS.map((c) => (
+                <label key={c} className="col-campo" title={`${c}. ${LABELS[c]}`}>
+                  <span>{c}. {LABELS[c]}<em className="grupo">{grupoDe(c)}</em></span>
+                  <input type="number" step="any" value={form.montos[c] ?? ''} onChange={(e) => setMonto(c, e.target.value)} />
+                </label>
+              ))}
+            </div>
+          </>
         )}
 
         {pestana === 'factores' && (
-          <div className="scroll-cols">
-            {MONTOS_COLS.map((c) => (
-              <label key={c} className="col-campo">
-                <span>{c}. {LABELS[c]}</span>
-                <input type="number" step="0.00000001" value={form.factores[c] ?? ''} onChange={(e) => setFactor(c, e.target.value)} />
-              </label>
-            ))}
-          </div>
+          <>
+            <ResumenSuma factores={form.factores} />
+            <div className="scroll-cols">
+              {MONTOS_COLS.map((c) => (
+                <label key={c} className="col-campo" title={`${c}. ${LABELS[c]}`}>
+                  <span>{c}. {LABELS[c]}<em className="grupo">{grupoDe(c)}</em></span>
+                  <input type="number" step="0.00000001" value={form.factores[c] ?? ''} onChange={(e) => setFactor(c, e.target.value)} />
+                </label>
+              ))}
+            </div>
+          </>
         )}
 
         {error && <p className="aviso err">{error}</p>}
@@ -314,16 +449,13 @@ function ModalCalificacion({ modal, onClose, onGuardado }) {
 }
 
 function ModalDetalle({ detalle, onClose, onCalcular, puedeEscribir }) {
-  const suma = sumaBase(detalle.factores || {})
   return (
     <div className="modal" role="dialog" aria-modal="true">
       <div className="modal-caja ancha">
         <button className="modal-x" aria-label="Cerrar" onClick={onClose}>×</button>
         <h2>{detalle.instrumento} — ej. {detalle.ejercicio} ({detalle.mercado})</h2>
         <p className="sub">Secuencia {detalle.secuencia} · N° div. {detalle.numero_dividendo} · {detalle.tipo_sociedad === 'A' ? 'Abierta' : 'Cerrada'} · ISFUT {detalle.isfut ? 'Sí' : 'No'} · Origen {detalle.origen} · Fuente {detalle.fuente}</p>
-        <div className="resumen">
-          <strong>Suma factores 8–19: {suma.toFixed(8)}</strong> {suma > 1 ? <span className="peligro-texto"> ¡supera 1!</span> : ' (≤ 1 ✓)'}
-        </div>
+        <ResumenSuma factores={detalle.factores || {}} />
         <div className="scroll-cols">
           {MONTOS_COLS.map((c) => (
             <div key={c} className="fila-detalle">
@@ -354,7 +486,7 @@ function Auditoria() {
         <thead><tr><th>#</th><th>Fecha</th><th>Acción</th><th>Registro</th><th>Detalle</th><th>Usuario</th></tr></thead>
         <tbody>
           {rows.map((r) => (
-            <tr key={r.id}><td className="num">{r.id}</td><td className="num">{r.fecha}</td><td><span className={`tag accion-${String(r.accion || '').toLowerCase()}`}>{r.accion}</span></td><td className="num">{r.registro_id ?? ''}</td><td>{r.detalle}</td><td className="dim">{r.usuario}</td></tr>
+            <tr key={r.id}><td data-l="#" className="num">{r.id}</td><td data-l="Fecha" className="num">{r.fecha}</td><td data-l="Acción"><span className={`tag accion-${String(r.accion || '').toLowerCase()}`}>{r.accion}</span></td><td data-l="Registro" className="num">{r.registro_id ?? ''}</td><td data-l="Detalle">{r.detalle}</td><td data-l="Usuario" className="dim">{r.usuario}</td></tr>
           ))}
         </tbody>
       </table>

@@ -43,3 +43,25 @@ export function formatFecha(iso) {
 export function sumaBase(factores) {
   return BASE_COLS.reduce((acc, c) => acc + (factores[c] || 0), 0)
 }
+
+// Agrupación de columnas por concepto (hoja 3.2 Homologacion del HDU)
+export const GRUPOS = [
+  { desde: 8, hasta: 11, concepto: 'Afectos a impuestos globales y/o adicional (IDPC)' },
+  { desde: 12, hasta: 16, concepto: 'Rentas con tributación cumplida (RAP, ISFUT)' },
+  { desde: 17, hasta: 18, concepto: 'Rentas exentas de IGC' },
+  { desde: 19, hasta: 19, concepto: 'Ingresos no constitutivos de renta' },
+  { desde: 20, hasta: 23, concepto: 'No sujetos a restitución' },
+  { desde: 24, hasta: 27, concepto: 'Sujetos a restitución' },
+  { desde: 28, hasta: 28, concepto: 'Crédito por IPE' },
+  { desde: 29, hasta: 32, concepto: 'Acumulados hasta 31.12.2016' },
+  { desde: 33, hasta: 33, concepto: 'Crédito por IPE (acumulados hasta 2016)' },
+  { desde: 34, hasta: 35, concepto: 'Crédito impuesto tasa adicional (Art. 21 LIR)' },
+  { desde: 36, hasta: 37, concepto: 'Tasa efectiva del crédito FUT (TEF/TEX)' },
+]
+
+export function grupoDe(col) {
+  const g = GRUPOS.find((x) => col >= x.desde && col <= x.hasta)
+  if (!g) return ''
+  const rango = g.desde === g.hasta ? `C${g.desde}` : `C${g.desde}–${g.hasta}`
+  return `${rango}: ${g.concepto}`
+}
