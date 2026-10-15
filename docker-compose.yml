@@ -3,6 +3,13 @@ services:
     build: ./backend
     ports:
       - "8001:8000"
+    environment:
+      FACTORUNO_SECRET: ${FACTORUNO_SECRET:-dev-secret-cambiar-en-produccion}
+      FACTORUNO_ADMIN_PASSWORD: ${FACTORUNO_ADMIN_PASSWORD:-Admin1234!}
+      FACTORUNO_ANALISTA_PASSWORD: ${FACTORUNO_ANALISTA_PASSWORD:-Analista1234!}
+      FACTORUNO_CONSULTA_PASSWORD: ${FACTORUNO_CONSULTA_PASSWORD:-Consulta1234!}
+      FACTORUNO_TOKEN_HORAS: ${FACTORUNO_TOKEN_HORAS:-8}
+      FACTORUNO_CORS_ORIGINS: ${FACTORUNO_CORS_ORIGINS:-}
     volumes:
       - db_data:/app/data
 

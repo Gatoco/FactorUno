@@ -1,4 +1,5 @@
 """SQLite schema and connection helpers."""
+import os
 import sqlite3
 from pathlib import Path
 
@@ -53,6 +54,15 @@ CREATE TABLE IF NOT EXISTS auditoria (
     usuario      TEXT NOT NULL DEFAULT 'corredor',
     fecha        TEXT NOT NULL DEFAULT (datetime('now','localtime'))
 );
+
+CREATE TABLE IF NOT EXISTS usuarios (
+    id             INTEGER PRIMARY KEY AUTOINCREMENT,
+    usuario        TEXT    NOT NULL UNIQUE,
+    password_hash  TEXT    NOT NULL,
+    rol            TEXT    NOT NULL CHECK (rol IN ('admin','analista','consulta')),
+    activo         INTEGER NOT NULL DEFAULT 1,
+    fecha_creacion TEXT    NOT NULL DEFAULT (datetime('now','localtime'))
+);
 """
 
 
@@ -64,14 +74,46 @@ def get_conn() -> sqlite3.Connection:
     return conn
 
 
+def _seed_usuarios(conn: sqlite3.Connection) -> None:
+    """Crea los usuarios base (admin/analista/consulta) si la tabla esta vacia."""
+    from . import auth  # import tardio: auth importa get_conn de este modulo
+
+    total = conn.execute("SELECT COUNT(*) FROM usuarios").fetchone()[0]
+    if total:
+        return
+    for usuario, (env_var, default) in auth.USUARIOS_SEED.items():
+        password = os.environ.get(env_var, default)
+        conn.execute(
+            "INSERT INTO usuarios (usuario, password_hash, rol) VALUES (?,?,?)",
+            (usuario, auth.hash_password(password), usuario),
+        )
+
+
 def init_db() -> None:
     with get_conn() as conn:
         conn.executescript(SCHEMA)
+        _seed_usuarios(conn)
 
 
 def audit(conn: sqlite3.Connection, accion: str, registro_id: int | None,
           detalle: str, usuario: str = "corredor") -> None:
-    conn.execute(
+    cur = conn.execute(
         "INSERT INTO auditoria (accion, registro_id, detalle, usuario) VALUES (?,?,?,?)",
         (accion, registro_id, detalle, usuario),
     )
+    # Espejo best-effort a DynamoDB (rúbrica 2.1.4.9); no-op sin tabla configurada.
+    try:
+        from . import aws_ext
+
+        fila = conn.execute(
+            "SELECT fecha FROM auditoria WHERE id=?", (cur.lastrowid,)
+        ).fetchone()
+        aws_ext.espejar_auditoria({
+            "accion": accion,
+            "registro_id": registro_id,
+            "detalle": detalle,
+            "usuario": usuario,
+            "fecha": fila["fecha"] if fila else "",
+        })
+    except Exception:
+        pass

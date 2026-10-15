@@ -1,7 +1,9 @@
 """Servicio: operaciones de negocio del Mantenedor de Calificaciones Tributarias."""
 import csv
 import io
+import json
 import sqlite3
+from datetime import datetime
 
 from . import reglas
 from .db import get_conn, audit
@@ -66,7 +68,8 @@ def _insertar_calificacion(conn, data: dict, fuente: str) -> int:
     return rid
 
 
-def crear_calificacion(data: dict, fuente: str = "manual") -> dict:
+def crear_calificacion(data: dict, fuente: str = "manual",
+                       usuario: str = "corredor") -> dict:
     """Crear calificacion. Si data trae montos sin factores -> calcula factores."""
     montos = data.get("montos") or {}
     factores = data.get("factores")
@@ -79,11 +82,13 @@ def crear_calificacion(data: dict, fuente: str = "manual") -> dict:
         data["factores"] = factores  # inyecta para que _insertar los persista
     with get_conn() as conn:
         rid = _insertar_calificacion(conn, data, fuente)
-        audit(conn, "INSERT", rid, f"{data['mercado']} {data['instrumento']} ej{data['ejercicio']}")
+        audit(conn, "INSERT", rid, f"{data['mercado']} {data['instrumento']} ej{data['ejercicio']}",
+              usuario)
     return obtener_calificacion(rid)
 
 
-def modificar_calificacion(registro_id: int, data: dict) -> dict | None:
+def modificar_calificacion(registro_id: int, data: dict,
+                           usuario: str = "corredor") -> dict | None:
     montos = data.get("montos")
     factores = data.get("factores")
     if factores is None and montos:
@@ -108,21 +113,21 @@ def modificar_calificacion(registro_id: int, data: dict) -> dict | None:
         if factores:
             for c, v in factores.items():
                 conn.execute("INSERT OR REPLACE INTO factores VALUES (?,?,?)", (registro_id, int(c), v))
-        audit(conn, "UPDATE", registro_id, f"modificacion id={registro_id}")
+        audit(conn, "UPDATE", registro_id, f"modificacion id={registro_id}", usuario)
     return obtener_calificacion(registro_id)
 
 
-def eliminar_calificacion(registro_id: int) -> bool:
+def eliminar_calificacion(registro_id: int, usuario: str = "corredor") -> bool:
     with get_conn() as conn:
         row = conn.execute("SELECT * FROM calificaciones WHERE id=?", (registro_id,)).fetchone()
         if not row:
             return False
         conn.execute("DELETE FROM calificaciones WHERE id=?", (registro_id,))
-        audit(conn, "DELETE", registro_id, f"eliminacion id={registro_id}")
+        audit(conn, "DELETE", registro_id, f"eliminacion id={registro_id}", usuario)
     return True
 
 
-def calcular_por_registro(registro_id: int) -> dict | None:
+def calcular_por_registro(registro_id: int, usuario: str = "corredor") -> dict | None:
     """Recalcula los factores de una calificacion a partir de sus montos (boton Calcular)."""
     with get_conn() as conn:
         row = conn.execute("SELECT * FROM calificaciones WHERE id=?", (registro_id,)).fetchone()
@@ -134,7 +139,7 @@ def calcular_por_registro(registro_id: int) -> dict | None:
         reglas.validar_suma_factores(factores)
         for c, v in factores.items():
             conn.execute("INSERT OR REPLACE INTO factores VALUES (?,?,?)", (registro_id, int(c), v))
-        audit(conn, "CALCULAR", registro_id, "recalculo de factores")
+        audit(conn, "CALCULAR", registro_id, "recalculo de factores", usuario)
     return obtener_calificacion(registro_id)
 
 
@@ -142,7 +147,7 @@ def _llave(data: dict) -> tuple:
     return tuple(str(data[k]).strip() for k in reglas.LLAVE_CAMPOS)
 
 
-def cargar_csv(texto: str, tipo: str = "montos") -> dict:
+def cargar_csv(texto: str, tipo: str = "montos", usuario: str = "corredor") -> dict:
     """Carga masiva CSV (historia 10): actualiza por llave si existe, agrega si no.
 
     tipo='montos': usa montos del CSV y calcula factores.
@@ -187,12 +192,13 @@ def cargar_csv(texto: str, tipo: str = "montos") -> dict:
                     conn.execute("INSERT OR REPLACE INTO montos VALUES (?,?,?)", (rid, c, v))
                 for c, v in data["factores"].items():
                     conn.execute("INSERT OR REPLACE INTO factores VALUES (?,?,?)", (rid, c, v))
-                audit(conn, "CARGA", rid, f"actualizado por llave (csv {tipo}) fila {i}")
+                audit(conn, "CARGA", rid, f"actualizado por llave (csv {tipo}) fila {i}",
+                      usuario)
                 actualizados += 1
             else:
                 rid = _insertar_calificacion(conn, data, "archivo")
                 llave_existente[llave] = rid
-                audit(conn, "CARGA", rid, f"insertado (csv {tipo}) fila {i}")
+                audit(conn, "CARGA", rid, f"insertado (csv {tipo}) fila {i}", usuario)
                 insertados += 1
     return {"insertados": insertados, "actualizados": actualizados, "errores": errores}
 
@@ -201,3 +207,52 @@ def listar_auditoria(limite: int = 100) -> list[dict]:
     with get_conn() as conn:
         return [_fila_a_dict(r) for r in conn.execute(
             "SELECT * FROM auditoria ORDER BY id DESC LIMIT ?", (limite,)).fetchall()]
+
+
+def construir_exportacion(formato: str) -> tuple[str, str, str]:
+    """Construye un respaldo completo de la base estructurada (rúbrica 2.1.4.9).
+
+    Devuelve (contenido, nombre_archivo, content_type). El contenido queda
+    listo para subirse a S3 como base no estructurada (objetos).
+    """
+    if formato not in ("json", "csv"):
+        raise ValueError("formato debe ser 'json' o 'csv'")
+    with get_conn() as conn:
+        calificaciones = [dict(r) for r in conn.execute(
+            "SELECT * FROM calificaciones ORDER BY id").fetchall()]
+        montos: dict[int, dict[int, float]] = {}
+        factores: dict[int, dict[int, float]] = {}
+        for r in conn.execute("SELECT calificacion_id, columna, monto FROM montos"):
+            montos.setdefault(r["calificacion_id"], {})[r["columna"]] = r["monto"]
+        for r in conn.execute("SELECT calificacion_id, columna, factor FROM factores"):
+            factores.setdefault(r["calificacion_id"], {})[r["columna"]] = r["factor"]
+        auditoria = [dict(r) for r in conn.execute(
+            "SELECT * FROM auditoria ORDER BY id DESC LIMIT 500").fetchall()]
+
+    marca = datetime.now().strftime("%Y%m%d-%H%M%S")
+    if formato == "json":
+        for c in calificaciones:
+            c["montos"] = montos.get(c["id"], {})
+            c["factores"] = factores.get(c["id"], {})
+        contenido = json.dumps(
+            {
+                "generado": marca,
+                "total_registros": len(calificaciones),
+                "registros": calificaciones,
+                "auditoria": auditoria,
+            },
+            ensure_ascii=False,
+            indent=2,
+        )
+        return contenido, f"factoruno-{marca}.json", "application/json"
+
+    buf = io.StringIO()
+    writer = csv.writer(buf)
+    columnas = ("id", "ejercicio", "mercado", "instrumento", "fecha_pago",
+                "secuencia", "numero_dividendo", "tipo_sociedad",
+                "valor_historico", "isfut", "origen", "fuente",
+                "fecha_creacion", "fecha_modificacion")
+    writer.writerow(columnas)
+    for c in calificaciones:
+        writer.writerow([c[k] for k in columnas])
+    return buf.getvalue(), f"factoruno-{marca}.csv", "text/csv"

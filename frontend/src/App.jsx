@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { api } from './api.js'
+import { api, getToken, guardarSesion, limpiarSesion } from './api.js'
 import { LABELS, MONTOS_COLS, BASE_COLS, formatFecha, sumaBase } from './columnas.js'
 import './styles.css'
 
@@ -26,6 +26,8 @@ export default function App() {
   const [aviso, setAviso] = useState(null)
   const [cargando, setCargando] = useState(false)
   const [pestana, setPestana] = useState('calificaciones') // calificaciones | auditoria
+  const [sesion, setSesion] = useState(null)
+  const [verificando, setVerificando] = useState(true)
 
   async function cargar() {
     setCargando(true)
@@ -39,12 +41,29 @@ export default function App() {
     }
   }
 
-  useEffect(() => { cargar() }, [])
+  useEffect(() => {
+    if (!getToken()) { setVerificando(false); return }
+    api.me().then(setSesion).catch(() => setSesion(null)).finally(() => setVerificando(false))
+  }, [])
+
+  useEffect(() => {
+    const expirar = () => setSesion(null)
+    window.addEventListener('sesion-expirada', expirar)
+    return () => window.removeEventListener('sesion-expirada', expirar)
+  }, [])
+
+  useEffect(() => { if (sesion) cargar() }, [sesion])
 
   function mostrarAviso(msg, error = false) {
     setAviso({ msg, error })
     setTimeout(() => setAviso(null), 5000)
   }
+
+  if (verificando) return <div className="pantalla-carga">Verificando sesión…</div>
+  if (!sesion) return <Login onLogin={(data) => { guardarSesion(data); setSesion({ usuario: data.usuario, rol: data.rol }) }} />
+
+  const puedeEscribir = sesion.rol === 'admin' || sesion.rol === 'analista'
+  function salir() { limpiarSesion(); setSesion(null); setFilas([]); setPestana('calificaciones') }
 
   return (
     <div className="app">
@@ -53,10 +72,17 @@ export default function App() {
           <h1>Calificaciones Tributarias</h1>
           <p className="sub">Mantenedor nuam — montos a factores · local por corredor</p>
         </div>
-        <nav className="tabs">
-          <button className={pestana === 'calificaciones' ? 'tab act' : 'tab'} onClick={() => setPestana('calificaciones')}>Calificaciones</button>
-          <button className={pestana === 'auditoria' ? 'tab act' : 'tab'} onClick={() => setPestana('auditoria')}>Auditoría</button>
-        </nav>
+        <div className="header-derecha">
+          <nav className="tabs">
+            <button className={pestana === 'calificaciones' ? 'tab act' : 'tab'} onClick={() => setPestana('calificaciones')}>Calificaciones</button>
+            {puedeEscribir && <button className={pestana === 'auditoria' ? 'tab act' : 'tab'} onClick={() => setPestana('auditoria')}>Auditoría</button>}
+          </nav>
+          <div className="usuario-chip">
+            <span>{sesion.usuario}</span>
+            <span className="rol">{sesion.rol}</span>
+            <button className="btn" onClick={salir}>Salir</button>
+          </div>
+        </div>
       </header>
 
       {aviso && <div className={aviso.error ? 'aviso err' : 'aviso'}>{aviso.msg}</div>}
@@ -64,10 +90,12 @@ export default function App() {
       {pestana === 'calificaciones' ? (
         <>
           <Filtros filtros={filtros} setFiltros={setFiltros} onBuscar={cargar} />
-          <div className="toolbar">
-            <button className="btn prim" onClick={() => setModal({ modo: 'crear', form: vacia() })}>Ingresar</button>
-            <CargaCsv onResultado={(r) => { cargar(); mostrarAviso(`Carga OK: ${r.insertados} insertados, ${r.actualizados} actualizados${r.errores?.length ? `, ${r.errores.length} errores` : ''}`) }} />
-          </div>
+          {puedeEscribir && (
+            <div className="toolbar">
+              <button className="btn prim" onClick={() => setModal({ modo: 'crear', form: vacia() })}>Ingresar</button>
+              <CargaCsv onResultado={(r) => { cargar(); mostrarAviso(`Carga OK: ${r.insertados} insertados, ${r.actualizados} actualizados${r.errores?.length ? `, ${r.errores.length} errores` : ''}`) }} />
+            </div>
+          )}
           <table className="grilla">
             <thead>
               <tr>
@@ -88,8 +116,8 @@ export default function App() {
                   <td>{f.origen}</td><td>{f.fuente}</td>
                   <td className="acciones">
                     <button onClick={async () => { setDetalle(await api.obtener(f.id)) }}>Ver</button>
-                    <button onClick={() => setModal({ modo: 'editar', id: f.id, form: convertirForm(f) })}>Modificar</button>
-                    <button className="peligro" onClick={async () => { if (confirm(`¿Eliminar ${f.instrumento} ej.${f.ejercicio}?`)) { await api.eliminar(f.id); cargar(); mostrarAviso('Eliminada') } }}>Eliminar</button>
+                    {puedeEscribir && <button onClick={() => setModal({ modo: 'editar', id: f.id, form: convertirForm(f) })}>Modificar</button>}
+                    {puedeEscribir && <button className="peligro" onClick={async () => { if (confirm(`¿Eliminar ${f.instrumento} ej.${f.ejercicio}?`)) { await api.eliminar(f.id); cargar(); mostrarAviso('Eliminada') } }}>Eliminar</button>}
                   </td>
                 </tr>
               ))}
@@ -114,7 +142,7 @@ export default function App() {
         />
       )}
 
-      {detalle && <ModalDetalle detalle={detalle} onClose={() => setDetalle(null)}
+      {detalle && <ModalDetalle detalle={detalle} puedeEscribir={puedeEscribir} onClose={() => setDetalle(null)}
         onCalcular={async () => {
           try { setDetalle(await api.calcular(detalle.id)); cargar(); mostrarAviso('Factores recalculados') }
           catch (e) { mostrarAviso(e.message, true) }
@@ -281,7 +309,7 @@ function ModalCalificacion({ modal, onClose, onGuardado }) {
   )
 }
 
-function ModalDetalle({ detalle, onClose, onCalcular }) {
+function ModalDetalle({ detalle, onClose, onCalcular, puedeEscribir }) {
   const suma = sumaBase(detalle.factores || {})
   return (
     <div className="modal">
@@ -303,7 +331,7 @@ function ModalDetalle({ detalle, onClose, onCalcular }) {
         </div>
         <div className="modal-botones">
           <button className="btn" onClick={onClose}>Cerrar</button>
-          <button className="btn prim" onClick={onCalcular}>Calcular factores</button>
+          {puedeEscribir && <button className="btn prim" onClick={onCalcular}>Calcular factores</button>}
         </div>
       </div>
     </div>
@@ -324,6 +352,43 @@ function Auditoria() {
           ))}
         </tbody>
       </table>
+    </div>
+  )
+}
+
+function Login({ onLogin }) {
+  const [usuario, setUsuario] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [enviando, setEnviando] = useState(false)
+
+  async function entrar(e) {
+    e.preventDefault()
+    setError('')
+    setEnviando(true)
+    try {
+      onLogin(await api.login(usuario, password))
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setEnviando(false)
+    }
+  }
+
+  return (
+    <div className="login-wrap">
+      <form className="login-caja" onSubmit={entrar}>
+        <h1>Calificaciones Tributarias</h1>
+        <p className="sub">Mantenedor nuam — acceso restringido</p>
+        <label>Usuario
+          <input value={usuario} onChange={(e) => setUsuario(e.target.value)} autoFocus autoComplete="username" />
+        </label>
+        <label>Contraseña
+          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" />
+        </label>
+        {error && <p className="aviso err">{error}</p>}
+        <button className="btn prim" disabled={enviando}>{enviando ? 'Ingresando…' : 'Ingresar'}</button>
+      </form>
     </div>
   )
 }
