@@ -1,7 +1,9 @@
+# FactorUno — guía única (video + uso de la app)
+
 **Video:** 5–7 minutos · **Caso:** cierre de dividendos del ejercicio 2024 (HDU real de nuam, usado como caso del ramo).
 **Quién habla:** el autor del desarrollo, en primera persona. No se actúa como funcionario de nuam: se muestra la aplicación y se explica lo que hace.
 **Regla del profesor:** mostrar la aplicación, no disertar. Frases de 5–10 segundos.
-**Cómo leer este documento:** una toma por página. Cada página dice qué hacer, qué escribir, qué decir y qué debe verse. No hay que buscar nada en otras páginas.
+**Cómo leer esta guía:** cada toma dice qué hacer, qué escribir, qué decir y qué debe verse. Al final está el anexo con el uso completo de la app.
 
 ## Antes de grabar
 
@@ -11,11 +13,9 @@
 - [ ] Cerrar notificaciones y pestañas. Grabar en 1080p con la cámara a la vista.
 - [ ] Si algo se traba: se corta y se repite esa toma.
 
-<div style="page-break-after: always;"></div>
-
 ## Los conceptos, en una línea cada uno
 
-Esta página es solo para preparar la grabación: no se lee en cámara.
+Esta sección es solo para preparar la grabación: no se lee en cámara.
 
 | Dato | Qué es | Ejemplo de la demo |
 |---|---|---|
@@ -33,8 +33,6 @@ Esta página es solo para preparar la grabación: no se lee en cámara.
 
 **En resumen:** el certificado dice cuánto se pagó y en qué columnas; la aplicación calcula qué parte de ese dividendo corresponde a cada concepto, deja la trazabilidad y genera el respaldo.
 
-<div style="page-break-after: always;"></div>
-
 ## Toma 1 — Entrar al sistema
 
 **Hacer:** abrir `http://100.57.30.193/`, usuario `admin`, contraseña `Admin1234!`.
@@ -42,8 +40,6 @@ Esta página es solo para preparar la grabación: no se lee en cámara.
 **Decir:** "Esta es la aplicación que desarrollé para el caso de FactorUno, que sale del HDU de nuam: registrar la calificación de los dividendos del ejercicio 2024, con sus factores, la trazabilidad y el respaldo. Ya está publicada en la nube, así que la abro directo."
 
 **Ver:** la pantalla de login y, al entrar, la grilla (todavía vacía: los certificados se cargan en la toma 4).
-
-<div style="page-break-after: always;"></div>
 
 ## Toma 2 — La grilla y sus filtros
 
@@ -53,8 +49,6 @@ Esta página es solo para preparar la grabación: no se lee en cámara.
 
 **Ver:** el mensaje "Sin calificaciones. Usa «Ingresar» o carga un CSV."; los filtros con **Buscar** y **Limpiar**; y la barra con **Ingresar**, **Carga de calificaciones** y **Exportar**. Con datos, cada fila muestra **Ver**, **Modificar** y **Eliminar**.
 
-<div style="page-break-after: always;"></div>
-
 ## Toma 3 — Llega el archivo y el sistema lo revisa antes de grabar
 
 **Hacer:** botón **Carga de calificaciones** → Tipo de carga `Montos (DJ 1948)` → Archivo → elegir `carga-montos-demo-error.csv`.
@@ -62,8 +56,6 @@ Esta página es solo para preparar la grabación: no se lee en cámara.
 **Decir:** "Este archivo tiene errores a propósito, para mostrar la validación. Antes de grabar, el sistema lo previsualiza: dice cuántos registros trae y qué línea está mal."
 
 **Ver:** la vista previa con 3 registros y la lista de avisos (fecha inválida, una fila con columnas de menos, tipo de sociedad inválido). Apretar **Cancelar**.
-
-<div style="page-break-after: always;"></div>
 
 ## Toma 4 — Cargar el lote de certificados
 
@@ -73,8 +65,6 @@ Esta página es solo para preparar la grabación: no se lee en cámara.
 
 **Ver:** el mensaje "Carga OK: 3 insertados" y los 3 registros en la grilla.
 
-<div style="page-break-after: always;"></div>
-
 ## Toma 5 — Filtrar por mercado
 
 **Hacer:** en **Mercado** elegir `ACN` y apretar **Buscar**.
@@ -82,8 +72,6 @@ Esta página es solo para preparar la grabación: no se lee en cámara.
 **Decir:** "Filtro por mercado: quedan solo los dos certificados de acciones que acabo de cargar."
 
 **Ver:** la tabla con 2 filas: `CENCOSUD S.A.` y `ENEL AMERICAS S.A.`.
-
-<div style="page-break-after: always;"></div>
 
 ## Toma 6 — Ver el cálculo que hace el sistema
 
@@ -93,8 +81,6 @@ Esta página es solo para preparar la grabación: no se lee en cámara.
 
 **Ver:** en el detalle, monto y factor por columna: columna 8 → `200.000` / `0.625` y columna 12 → `120.000` / `0.375` (el factor se muestra con punto decimal).
 
-<div style="page-break-after: always;"></div>
-
 ## Toma 7 — Corregir un error de tipeo
 
 **Hacer:** abrir el registro `ENEL AMERICAS S.A.` en edición → pestaña **Factores** → en la columna 8 escribir `0.7` → después corregirlo a `0.625`.
@@ -102,8 +88,6 @@ Esta página es solo para preparar la grabación: no se lee en cámara.
 **Decir:** "Si me equivoco, la suma se calcula en vivo y me avisa antes de grabar."
 
 **Ver:** el recuadro de suma en rojo con "¡supera 1!"; al corregirlo, vuelve a 1 con "(≤ 1 ✓)". Cerrar con **Cancelar**.
-
-<div style="page-break-after: always;"></div>
 
 ## Toma 8 — Registrar a mano un certificado que no vino en el lote
 
@@ -120,8 +104,6 @@ Ejercicio `2024` · Mercado `CFI` · Instrumento `AGUAS ANDINAS S.A.` · Fecha d
 
 **Ver:** el mensaje de guardado; después apretar **Limpiar** para refrescar la lista y ver `AGUAS ANDINAS S.A.` junto a los otros tres.
 
-<div style="page-break-after: always;"></div>
-
 ## Toma 9 — Auditoría
 
 **Hacer:** pestaña **Auditoría**.
@@ -129,8 +111,6 @@ Ejercicio `2024` · Mercado `CFI` · Instrumento `AGUAS ANDINAS S.A.` · Fecha d
 **Decir:** "Cada ingreso, modificación o eliminación queda auditado con usuario, fecha y hora, y además se replica en la base de datos en la nube."
 
 **Ver:** la tabla con el registro del ingreso recién hecho y el usuario `admin`.
-
-<div style="page-break-after: always;"></div>
 
 ## Toma 10 — Exportar el respaldo
 
@@ -140,8 +120,6 @@ Ejercicio `2024` · Mercado `CFI` · Instrumento `AGUAS ANDINAS S.A.` · Fecha d
 
 **Ver:** el modal con el nombre del archivo y el bucket; después la descarga del JSON en una pestaña nueva.
 
-<div style="page-break-after: always;"></div>
-
 ## Toma 11 — Cierre en el teléfono
 
 **Hacer:** **Salir** → entrar con `analista` / `Analista1234!` → achicar la ventana hasta unos 390 px de ancho (o abrir la misma dirección en el teléfono).
@@ -149,8 +127,6 @@ Ejercicio `2024` · Mercado `CFI` · Instrumento `AGUAS ANDINAS S.A.` · Fecha d
 **Decir:** "La misma aplicación en pantalla chica: la grilla se convierte en tarjetas y el formulario se apila en una columna. Con esto cierro la demo; el repositorio, el informe y la solución en la nube están en el documento de entrega."
 
 **Ver:** la grilla como tarjetas (etiqueta a la izquierda, valor a la derecha) y el formulario de ingreso en una sola columna.
-
-<div style="page-break-after: always;"></div>
 
 ## Si algo falla
 
@@ -163,6 +139,33 @@ Ejercicio `2024` · Mercado `CFI` · Instrumento `AGUAS ANDINAS S.A.` · Fecha d
 | **Exportar** muestra error | La nube no está configurada en ese entorno. En el servidor de la demo sí funciona. |
 | La página no responde | El laboratorio se apagó o cambió de IP. Revisar antes de grabar. |
 | El login con `admin` falla | Probar `analista` con `Analista1234!` y seguir. |
+
+## Después de grabar
+
+1. Subir el video (Drive o YouTube no listado) y pegar el enlace en el documento de entrega, en la línea del video.
+2. Avisar para dejar la grilla con datos de ejemplo y el laboratorio encendido el día de la entrega.
+
+## Anexo — Cómo se usa la app (referencia rápida)
+
+**Entrar:** `http://100.57.30.193/`. Usuarios: `admin` y `analista` (ven y editan todo) · `consulta` (solo ve).
+
+**Grilla y filtros:** filtros por **Mercado** (ACN/CFI/FM), **Origen** (corredor/entidad) y **Período** (año) + botones **Buscar** y **Limpiar**. Cada fila tiene **Ver**, **Modificar** y **Eliminar** (modificar y eliminar solo admin/analista).
+
+**Ingresar un certificado:** botón **Ingresar** → pestañas **Datos básicos** → **Montos** → **Factores** → **Guardar**. Si cargas montos, los factores se calculan solos al guardar.
+
+**Ver el detalle:** **Ver** → muestra monto y factor por columna y el botón **Calcular factores** (deja el cálculo guardado).
+
+**Factores a mano:** pestaña **Factores** con la suma de la base 8–19 en vivo; si supera 1, avisa en rojo.
+
+**Cargar un CSV:** botón **Carga de calificaciones** → tipo de carga → archivo → vista previa con avisos → **Confirmar carga (N)**. La carga actualiza por llave (ejercicio + mercado + instrumento + fecha + secuencia + dividendo + tipo de sociedad), no duplica.
+
+**Auditoría:** pestaña **Auditoría** — cada cambio con usuario, fecha y hora; además se replica en la base de datos en la nube (DynamoDB).
+
+**Exportar:** botón **Exportar** → **JSON** o **CSV** → se publica en el bucket S3 y devuelve una URL firmada válida por 1 hora.
+
+**Móvil:** con la ventana bajo 560 px, la grilla pasa a tarjetas y el formulario a una sola columna.
+
+**Reglas fijas:** fecha AAAA-MM-DD · mercado ACN/CFI/FM · sociedad A/C · origen corredor/entidad · suma de la base 8–19 ≤ 1 · montos en columnas 8–37 agrupados por concepto del SII · solo admin y analista editan.
 
 ## No hace falta mostrar
 
