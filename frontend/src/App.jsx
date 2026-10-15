@@ -355,6 +355,13 @@ function convertirForm(f) {
   }
 }
 
+function Ayuda({ ancla, texto }) {
+  return (
+    <a className="ayuda" href={`/ayuda#${ancla}`} target="_blank" rel="noreferrer"
+      title={`Ayuda: ${texto}`} onClick={(e) => e.stopPropagation()}>?</a>
+  )
+}
+
 function ModalCalificacion({ modal, onClose, onGuardado }) {
   const [form, setForm] = useState(modal.form)
   const [pestana, setPestana] = useState('basicos')
@@ -383,30 +390,30 @@ function ModalCalificacion({ modal, onClose, onGuardado }) {
         <h2>{modal.modo === 'crear' ? 'Ingresar Calificación' : `Modificar Calificación #${modal.id}`}</h2>
         <div className="pestanas">
           <button className={pestana === 'basicos' ? 'tab act' : 'tab'} onClick={() => setPestana('basicos')}>Datos básicos</button>
-          <button className={pestana === 'montos' ? 'tab act' : 'tab'} onClick={() => setPestana('montos')}>Montos (29 campos)</button>
+          <button className={pestana === 'montos' ? 'tab act' : 'tab'} onClick={() => setPestana('montos')}>Montos (8-37)</button>
           <button className={pestana === 'factores' ? 'tab act' : 'tab'} onClick={() => setPestana('factores')}>Factores</button>
         </div>
 
         {pestana === 'basicos' && (
           <div className="form-grid">
-            <label>Mercado <select value={form.mercado} onChange={(e) => set('mercado', e.target.value)}><option value="">—</option><option>ACN</option><option>CFI</option><option>FM</option></select></label>
-            <label>Instrumento <input value={form.instrumento} onChange={(e) => set('instrumento', e.target.value)} /></label>
-            <label>Ejercicio <input type="number" value={form.ejercicio} onChange={(e) => set('ejercicio', Number(e.target.value))} /></label>
-            <label>Fecha pago <input type="date" value={formatFecha(form.fecha_pago)} onChange={(e) => set('fecha_pago', e.target.value)} /></label>
-            <label>Secuencia evento <input type="number" value={form.secuencia} onChange={(e) => set('secuencia', e.target.value)} /></label>
-            <label>N° dividendo <input type="number" value={form.numero_dividendo} onChange={(e) => set('numero_dividendo', e.target.value)} /></label>
-            <label>Tipo sociedad
+            <label>Mercado <Ayuda ancla="mercado" texto="Mercado" /> <select value={form.mercado} onChange={(e) => set('mercado', e.target.value)}><option value="">—</option><option>ACN</option><option>CFI</option><option>FM</option></select></label>
+            <label>Instrumento <Ayuda ancla="instrumento" texto="Instrumento" /> <input value={form.instrumento} onChange={(e) => set('instrumento', e.target.value)} /></label>
+            <label>Ejercicio <Ayuda ancla="ejercicio" texto="Ejercicio" /> <input type="number" value={form.ejercicio} onChange={(e) => set('ejercicio', Number(e.target.value))} /></label>
+            <label>Fecha pago <Ayuda ancla="fecha-pago" texto="Fecha pago" /> <input type="date" value={formatFecha(form.fecha_pago)} onChange={(e) => set('fecha_pago', e.target.value)} /></label>
+            <label>Secuencia evento <Ayuda ancla="secuencia" texto="Secuencia evento" /> <input type="number" value={form.secuencia} onChange={(e) => set('secuencia', e.target.value)} /></label>
+            <label>N° dividendo <Ayuda ancla="numero-dividendo" texto="N° dividendo" /> <input type="number" value={form.numero_dividendo} onChange={(e) => set('numero_dividendo', e.target.value)} /></label>
+            <label>Tipo sociedad <Ayuda ancla="tipo-sociedad" texto="Tipo sociedad" />
               <select value={form.tipo_sociedad} onChange={(e) => set('tipo_sociedad', e.target.value)}>
                 <option value="A">Abierta (A)</option><option value="C">Cerrada (C)</option>
               </select>
             </label>
-            <label>Valor histórico <input type="number" step="any" value={form.valor_historico} onChange={(e) => set('valor_historico', e.target.value)} /></label>
-            <label>Origen
+            <label>Valor histórico <Ayuda ancla="valor-historico" texto="Valor histórico" /> <input type="number" step="any" value={form.valor_historico} onChange={(e) => set('valor_historico', e.target.value)} /></label>
+            <label>Origen <Ayuda ancla="origen" texto="Origen" />
               <select value={form.origen} onChange={(e) => set('origen', e.target.value)}>
                 <option>corredor</option><option>entidad</option>
               </select>
             </label>
-            <label className="chk"><input type="checkbox" checked={form.isfut} onChange={(e) => set('isfut', e.target.checked)} /> ISFUT</label>
+            <label className="chk"><input type="checkbox" checked={form.isfut} onChange={(e) => set('isfut', e.target.checked)} /> ISFUT <Ayuda ancla="isfut" texto="ISFUT" /></label>
           </div>
         )}
 
@@ -416,7 +423,7 @@ function ModalCalificacion({ modal, onClose, onGuardado }) {
             <div className="scroll-cols">
               {MONTOS_COLS.map((c) => (
                 <label key={c} className="col-campo" title={`${c}. ${LABELS[c]}`}>
-                  <span>{c}. {LABELS[c]}<em className="grupo">{grupoDe(c)}</em></span>
+                  <span>{c}. {LABELS[c]} <Ayuda ancla={`c${c}`} texto={`${c}. ${LABELS[c]}`} /><em className="grupo">{grupoDe(c)}</em></span>
                   <input type="number" step="any" value={form.montos[c] ?? ''} onChange={(e) => setMonto(c, e.target.value)} />
                 </label>
               ))}
@@ -430,7 +437,7 @@ function ModalCalificacion({ modal, onClose, onGuardado }) {
             <div className="scroll-cols">
               {MONTOS_COLS.map((c) => (
                 <label key={c} className="col-campo" title={`${c}. ${LABELS[c]}`}>
-                  <span>{c}. {LABELS[c]}<em className="grupo">{grupoDe(c)}</em></span>
+                  <span>{c}. {LABELS[c]} <Ayuda ancla={`c${c}`} texto={`${c}. ${LABELS[c]}`} /><em className="grupo">{grupoDe(c)}</em></span>
                   <input type="number" step="0.00000001" value={form.factores[c] ?? ''} onChange={(e) => setFactor(c, e.target.value)} />
                 </label>
               ))}

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc 3.11" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Ayuda — FactorUno: qué significa cada campo</title>
+  <style>
+
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+
+ul.task-list[class]{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+font-size: inherit;
+width: 0.8em;
+margin: 0 0.8em 0.2em -1.6em;
+vertical-align: middle;
+}
+</style>
+  <style type="text/css">@page {
+size: Letter;
+margin: 2.5cm 2.5cm 2.5cm 2.5cm;
+}
+body {
+font-family: "Times New Roman", Times, serif;
+font-size: 12pt;
+line-height: 1.6;
+color: #000;
+margin: 0;
+}
+h1, h2, h3, h4 {
+font-family: "Times New Roman", Times, serif;
+color: #000;
+break-after: avoid;
+page-break-after: avoid;
+}
+h1 { font-size: 20pt; text-align: center; margin-top: 0; }
+h2 { font-size: 16pt; border-bottom: 1px solid #000; padding-bottom: 4px; margin-top: 28px; break-after: avoid; page-break-after: avoid; }
+h3 { font-size: 13pt; margin-top: 18px; break-after: avoid; page-break-after: avoid; }
+h4 { font-size: 12pt; margin-top: 14px; break-after: avoid; page-break-after: avoid; }
+p, table { break-inside: auto; }
+p { text-align: justify; }
+
+table { break-inside: avoid; page-break-inside: avoid; }
+table {
+border-collapse: collapse;
+width: 100%;
+margin: 12px 0;
+font-size: 10.5pt;
+}
+th, td {
+border: 1px solid #000;
+padding: 6px 8px;
+text-align: left;
+vertical-align: top;
+}
+th { background-color: #f0f0f0; font-weight: bold; }
+blockquote {
+border-left: 3px solid #999;
+margin: 10px 0;
+padding-left: 12px;
+font-style: italic;
+}
+hr { border: none; border-top: 1px solid #000; margin: 20px 0; }
+ul, ol { margin: 8px 0 8px 24px; }
+li { margin-bottom: 4px; }
+strong { font-weight: bold; }
+
+img {
+max-width: 100%;
+height: auto;
+display: block;
+margin: 12px auto;
+break-inside: avoid;
+page-break-inside: avoid;
+}
+</style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Ayuda — FactorUno: qué significa cada campo</h1>
+</header>
+<p>Esta página explica, en simple, <strong>qué significa cada
+campo</strong> del formulario de FactorUno: de dónde sale, qué
+información va y cómo se calculan los factores.</p>
+<p><strong>Cómo leerla:</strong> en el formulario, cada nombre de campo
+tiene un botón <strong>?</strong> al lado que abre esta página directo
+en la explicación de ese campo.</p>
+<h2 id="calculo">Cómo se calculan los factores</h2>
+<p>El certificado del SII (DJ 1948) desglosa cada dividendo en
+<strong>30 columnas</strong>, numeradas de la <strong>8</strong> a la
+<strong>37</strong>. Cada columna es un tipo de renta distinto:</p>
+<ul>
+<li><strong>Monto:</strong> cuánto del dividendo corresponde a esa
+columna (en pesos).</li>
+<li><strong>Factor:</strong> qué proporción del total representa esa
+columna. Se calcula solo:</li>
+</ul>
+<blockquote>
+<p><strong>factor = monto de la columna ÷ suma de los montos de las
+columnas 8 a 19</strong></p>
+</blockquote>
+<p>La suma de las columnas 8 a 19 es la <strong>base</strong>
+(representa el 100 %). El factor se redondea a 8 decimales y siempre
+debe ser <strong>menor o igual a 1 (≤ 1)</strong>. Si la suma de los
+factores 8 a 19 <strong>supera 1</strong>, los montos no cuadran: el
+sistema lo avisa con «¡supera 1!».</p>
+<p>Cada columna pertenece a un <strong>grupo</strong> (el texto de abajo
+aparece bajo cada nombre en el formulario). Por ejemplo, las columnas 8
+a 11 comparten el grupo «Afectos a impuestos globales y/o adicional
+(IDPC)»: son rentas del mismo tipo de impuesto. <strong>Con derecho /
+sin derecho</strong> significa si la renta tiene o no derecho a usar el
+crédito por el impuesto ya pagado.</p>
+<h2 id="datos-basicos">Los datos básicos</h2>
+<h3 id="ejercicio">Ejercicio</h3>
+<p>El <strong>año comercial</strong> (tributario) al que pertenece el
+dividendo. No es lo mismo que la fecha de pago: un dividendo pagado en
+2024 puede pertenecer al ejercicio 2023 o 2024, según lo indique el
+certificado.</p>
+<p><strong>Qué escribir:</strong> el año que trae el certificado (por
+ejemplo, <code>2024</code>).</p>
+<h3 id="mercado">Mercado</h3>
+<p>De dónde viene el instrumento:</p>
+<ul>
+<li><strong>ACN</strong> — acciones (empresas que cotizan en
+bolsa).</li>
+<li><strong>CFI</strong> — cuotas de fondos de inversión.</li>
+<li><strong>FM</strong> — fondos mutuos.</li>
+</ul>
+<p><strong>Qué elegir:</strong> el mercado que indique el
+certificado.</p>
+<h3 id="instrumento">Instrumento</h3>
+<p>El <strong>nombre del emisor</strong> que pagó el dividendo (la
+empresa o el fondo).</p>
+<p><strong>Qué escribir:</strong> el nombre tal como aparece en el
+certificado (por ejemplo, <code>ENEL AMERICAS S.A.</code>).</p>
+<h3 id="fecha-pago">Fecha pago</h3>
+<p>El día en que el dividendo <strong>se pagó</strong>.</p>
+<p><strong>Qué escribir:</strong> en formato <code>AAAA-MM-DD</code>
+(por ejemplo, <code>2024-05-06</code>). En la carga masiva, cualquier
+otro formato se marca como error.</p>
+<h3 id="secuencia">Secuencia evento</h3>
+<p>El <strong>número de orden del pago</strong> dentro del mismo
+instrumento y ejercicio: si el mismo emisor pagó dos dividendos en el
+año, cada uno tiene su secuencia (1, 2, …).</p>
+<p><strong>Qué escribir:</strong> el número que trae el certificado.</p>
+<h3 id="numero-dividendo">N° dividendo</h3>
+<p>El <strong>número identificador del dividendo</strong> que trae el
+certificado. Junto con el instrumento, el ejercicio y la secuencia,
+distingue este pago de cualquier otro.</p>
+<p><strong>Qué escribir:</strong> el número del certificado.</p>
+<h3 id="tipo-sociedad">Tipo sociedad</h3>
+<ul>
+<li><strong>Abierta (A)</strong> — sociedad anónima abierta (cotiza en
+bolsa).</li>
+<li><strong>Cerrada (C)</strong> — sociedad anónima cerrada.</li>
+</ul>
+<p><strong>Qué elegir:</strong> el tipo que indique el certificado.</p>
+<h3 id="valor-historico">Valor histórico</h3>
+<p>El <strong>valor de la acción o cuota al momento del
+dividendo</strong> que trae el certificado.</p>
+<p><strong>Qué escribir:</strong> el valor histórico del certificado; si
+no lo trae, se puede dejar en <code>0</code>.</p>
+<h3 id="origen">Origen</h3>
+<p>El <strong>canal por el que llegó la información</strong>:
+<code>corredor</code> (corredor de bolsa) o <code>entidad</code> (banco
+u otra institución).</p>
+<p><strong>Qué elegir:</strong> en el uso normal del mantenedor,
+<code>corredor</code>.</p>
+<h3 id="isfut">ISFUT</h3>
+<p>Casilla del <strong>impuesto sustitutivo al FUT</strong> (Ley
+20.780). Se <strong>marca</strong> solo si el certificado indica que el
+pago está acogido a ese régimen; si no, se deja sin marcar.</p>
+<h2 id="montos">Montos y factores: las columnas 8 a 37</h2>
+<p><strong>Montos:</strong> se copian del certificado columna por
+columna. Si el certificado no trae una columna (porque ese tipo de renta
+no aplica a ese dividendo), se deja <strong>vacía</strong> (el sistema
+la guarda como 0).</p>
+<p><strong>Factores:</strong> se calculan solos con el botón
+<strong>Calcular factores</strong> (está en el detalle del registro).
+También se pueden editar a mano en la pestaña <strong>Factores</strong>,
+por ejemplo si el certificado ya los trae calculados.</p>
+<h3 id="c8">Columna 8 — Con crédito IDPC (gen. 01.01.2017)</h3>
+<p>Dividendos con crédito por <strong>IDPC</strong> (Impuesto de Primera
+Categoría: el impuesto a la renta que pagan las empresas) por utilidades
+generadas <strong>a contar del 01.01.2017</strong>.</p>
+<h3 id="c9">Columna 9 — Con crédito IDPC (acum. 31.12.2016)</h3>
+<p>Lo mismo que la columna 8, pero por utilidades <strong>acumuladas
+hasta el 31.12.2016</strong> (régimen anterior a la reforma
+tributaria).</p>
+<h3 id="c10">Columna 10 — Con derecho crédito pago IDPC voluntario</h3>
+<p>Rentas con derecho al crédito por el <strong>pago voluntario del
+IDPC</strong>.</p>
+<h3 id="c11">Columna 11 — Sin derecho a crédito</h3>
+<p>Rentas afectas a impuestos, pero <strong>sin derecho a
+crédito</strong>.</p>
+<h3 id="c12">Columna 12 — RAP y Dif. Inicial (ex Art. 14 TER A)</h3>
+<p>Rentas del registro <strong>RAP</strong> (Rentas Afectas a los
+Propietarios) y la <strong>Diferencia Inicial</strong> de sociedades que
+venían del ex Art. 14 TER A de la Ley de la Renta.</p>
+<h3 id="c13">Columna 13 — Otras rentas percibidas sin prioridad</h3>
+<p><strong>Otras rentas percibidas</strong> que no tienen prioridad en
+su orden de imputación.</p>
+<h3 id="c14">Columna 14 — Exceso Distribuciones Desproporcionadas (N°9
+Art. 14 A)</h3>
+<p>Montos del <strong>exceso de distribuciones
+desproporcionadas</strong> (N° 9 del Art. 14 A de la Ley de la
+Renta).</p>
+<h3 id="c15">Columna 15 — ISFUT Ley N°20.780</h3>
+<p>Utilidades afectadas con el <strong>ISFUT</strong> (impuesto
+sustitutivo al FUT) de la Ley 20.780.</p>
+<h3 id="c16">Columna 16 — Rentas hasta 31.12.1983 / ISFUT Ley
+N°21.210</h3>
+<p>Rentas generadas <strong>hasta el 31.12.1983</strong> y/o rentas del
+<strong>ISFUT</strong> de la Ley 21.210.</p>
+<h3 id="c17">Columna 17 — Rentas exentas IGC (Art.11 L.18.401) afectas a
+IA</h3>
+<p>Rentas <strong>exentas del IGC</strong> (Impuesto Global
+Complementario: el impuesto personal de las personas) que sí están
+afectas al <strong>IA</strong> (Impuesto Adicional).</p>
+<h3 id="c18">Columna 18 — Rentas exentas IGC y/o IA</h3>
+<p>Rentas exentas del <strong>IGC y/o del IA</strong>.</p>
+<h3 id="c19">Columna 19 — Ingresos No Constitutivos de Renta</h3>
+<p>Ingresos que <strong>no constituyen renta</strong>: no se gravan; se
+informan aparte.</p>
+<h3 id="c20">Columna 20 — No sujetos restitución hasta 31.12.2019 sin
+derecho</h3>
+<p>Rentas <strong>no sujetas a restitución</strong> (tramo hasta el
+31.12.2019), <strong>sin derecho</strong> a crédito.</p>
+<h3 id="c21">Columna 21 — No sujetos restitución hasta 31.12.2019 con
+derecho</h3>
+<p>Igual que la columna 20, pero <strong>con derecho</strong> a
+crédito.</p>
+<h3 id="c22">Columna 22 — No sujetos restitución desde 01.01.2020 sin
+derecho</h3>
+<p>Rentas no sujetas a restitución <strong>desde el 01.01.2020</strong>,
+<strong>sin derecho</strong> a crédito.</p>
+<h3 id="c23">Columna 23 — No sujetos restitución desde 01.01.2020 con
+derecho</h3>
+<p>Igual que la columna 22, pero <strong>con derecho</strong> a
+crédito.</p>
+<h3 id="c24">Columna 24 — Sujetos a restitución sin derecho</h3>
+<p>Rentas <strong>sujetas a restitución</strong>, <strong>sin
+derecho</strong> a crédito.</p>
+<h3 id="c25">Columna 25 — Sujetos a restitución con derecho</h3>
+<p>Rentas sujetas a restitución, <strong>con derecho</strong> a
+crédito.</p>
+<h3 id="c26">Columna 26 — Sujetos a restitución sin derecho (2)</h3>
+<p>Segundo grupo de rentas sujetas a restitución, <strong>sin
+derecho</strong> (el certificado separa estos montos igual que en las
+columnas 24 y 25).</p>
+<h3 id="c27">Columna 27 — Sujetos a restitución con derecho (2)</h3>
+<p>Segundo grupo, <strong>con derecho</strong> a crédito.</p>
+<h3 id="c28">Columna 28 — Crédito por IPE</h3>
+<p><strong>Crédito por IPE</strong> (así lo rotula el certificado): un
+crédito de impuesto asociado a las rentas del dividendo.</p>
+<h3 id="c29">Columna 29 — Asociados a Rentas Afectas, sin derecho</h3>
+<p>Montos <strong>asociados a rentas afectas</strong> (acumulados hasta
+el 31.12.2016), <strong>sin derecho</strong> a crédito.</p>
+<h3 id="c30">Columna 30 — Asociados a Rentas Afectas, con derecho</h3>
+<p>Igual que la columna 29, pero <strong>con derecho</strong> a
+crédito.</p>
+<h3 id="c31">Columna 31 — Asociados a Rentas Exentas (Art.11 L.18.401),
+sin derecho</h3>
+<p>Montos <strong>asociados a rentas exentas</strong> (Art. 11, Ley
+18.401), <strong>sin derecho</strong> a crédito.</p>
+<h3 id="c32">Columna 32 — Asociados a Rentas Exentas (Art.11 L.18.401),
+con derecho</h3>
+<p>Igual que la columna 31, pero <strong>con derecho</strong> a
+crédito.</p>
+<h3 id="c33">Columna 33 — Crédito por IPE (acumulados 31.12.2016)</h3>
+<p>Crédito por IPE <strong>acumulado hasta el 31.12.2016</strong>.</p>
+<h3 id="c34">Columna 34 — Crédito impuesto tasa adicional ex Art.21 LIR,
+sin derecho</h3>
+<p>Crédito por el <strong>impuesto de tasa adicional</strong> del Art.
+21 de la Ley de la Renta (el impuesto a los gastos rechazados),
+<strong>sin derecho</strong>.</p>
+<h3 id="c35">Columna 35 — Crédito impuesto tasa adicional ex Art.21 LIR,
+con derecho</h3>
+<p>Igual que la columna 34, pero <strong>con derecho</strong>.</p>
+<h3 id="c36">Columna 36 — Tasa efectiva crédito FUT (TEF)</h3>
+<p><strong>Tasa efectiva del crédito FUT (TEF).</strong> No es un monto
+en pesos: es una tasa que trae el certificado.</p>
+<h3 id="c37">Columna 37 — Tasa efectiva crédito FUT (TEX)</h3>
+<p><strong>Tasa efectiva del crédito FUT (TEX).</strong> Segunda tasa
+del certificado, igual que la columna 36.</p>
+<h2 id="resto">El resto de la aplicación</h2>
+<ul>
+<li><strong>Carga masiva (CSV):</strong> sube varios certificados de una
+vez. Antes de grabar, el sistema <strong>previsualiza</strong> el
+archivo y avisa los errores de formato por línea (fecha, cantidad de
+columnas, tipo de sociedad). Cada fila se identifica por su
+<strong>llave</strong> (ejercicio + mercado + instrumento + fecha +
+secuencia + N° dividendo + tipo sociedad): si ya existe, se
+<strong>actualiza</strong>; si no, se <strong>inserta</strong>.</li>
+<li><strong>Auditoría:</strong> registra cada cambio (INSERT, UPDATE,
+DELETE) con fecha, usuario y detalle, y se espeja en la nube (DynamoDB)
+para trazabilidad.</li>
+<li><strong>Exportar:</strong> genera un respaldo JSON o CSV y lo
+publica en la nube (S3); devuelve una <strong>URL firmada</strong> que
+dura 1 hora para compartirlo sin dar acceso al bucket.</li>
+<li><strong>Usuarios:</strong> <code>admin</code> y
+<code>analista</code> pueden ingresar y modificar; <code>consulta</code>
+solo puede ver.</li>
+</ul>
+</body>
+</html>
