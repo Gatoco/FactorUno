@@ -155,5 +155,5 @@ def exportar(formato: str = "json",
     contenido, nombre, content_type = servicio.construir_exportacion(formato)
     try:
         return aws_ext.exportar_a_s3(contenido, nombre, content_type)
-    except ValueError as e:
+    except (ValueError, aws_ext.AlmacenamientoNoDisponible) as e:
         raise HTTPException(503, str(e))

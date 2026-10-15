@@ -13,6 +13,10 @@ import os
 from datetime import datetime
 
 
+class AlmacenamientoNoDisponible(RuntimeError):
+    """S3 configurado pero inaccesible: falló la subida o la firma del respaldo."""
+
+
 def _region() -> str:
     return os.environ.get("AWS_REGION", os.environ.get("AWS_DEFAULT_REGION", "us-east-1"))
 
@@ -72,23 +76,29 @@ def exportar_a_s3(contenido: str, nombre: str, content_type: str,
                   expira_segundos: int = 3600) -> dict:
     """Sube un respaldo a S3 y devuelve una URL prefirmada temporal.
 
-    Lanza ValueError si S3 no está configurado (la API lo traduce a 503).
+    Lanza AlmacenamientoNoDisponible si S3 no está configurado o si la
+    subida/firma falla por un error de AWS (la API lo traduce a 503).
     """
     bucket = bucket_exportaciones()
     if not bucket:
-        raise ValueError(
+        raise AlmacenamientoNoDisponible(
             "Almacenamiento S3 no configurado (defina FACTORUNO_S3_BUCKET)"
         )
     cliente = _cliente_s3()
-    cliente.put_object(
-        Bucket=bucket, Key=nombre, Body=contenido.encode("utf-8"),
-        ContentType=content_type,
-    )
-    url = cliente.generate_presigned_url(
-        "get_object",
-        Params={"Bucket": bucket, "Key": nombre},
-        ExpiresIn=expira_segundos,
-    )
+    try:
+        cliente.put_object(
+            Bucket=bucket, Key=nombre, Body=contenido.encode("utf-8"),
+            ContentType=content_type,
+        )
+        url = cliente.generate_presigned_url(
+            "get_object",
+            Params={"Bucket": bucket, "Key": nombre},
+            ExpiresIn=expira_segundos,
+        )
+    except Exception as exc:
+        raise AlmacenamientoNoDisponible(
+            f"S3 no disponible al publicar el respaldo: {exc}"
+        ) from exc
     return {
         "bucket": bucket,
         "clave": nombre,

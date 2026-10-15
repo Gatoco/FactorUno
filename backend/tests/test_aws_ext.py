@@ -151,3 +151,18 @@ def test_exportar_csv_sube_a_s3(client, headers, monkeypatch):
     assert cuerpo.startswith("id,ejercicio,mercado,instrumento")
     assert "EXPORT_CSV" in cuerpo
     assert fake.objetos[0]["type"] == "text/csv"
+
+
+def test_exportar_error_de_s3_retorna_503(client, headers, monkeypatch):
+    """Un fallo real de S3 (no configuración) se traduce a 503 controlado."""
+    monkeypatch.setenv("FACTORUNO_S3_BUCKET", "factoruno-respaldos")
+
+    class FakeS3Roto(FakeS3):
+        def put_object(self, Bucket, Key, Body, ContentType):
+            raise RuntimeError("s3 no disponible")
+
+    monkeypatch.setattr(aws_ext, "_cliente_s3", lambda: FakeS3Roto())
+
+    _crear(client, headers, instrumento="EXPORT_FAIL")
+    r = client.get("/api/exportar", params={"formato": "json"}, headers=headers)
+    assert r.status_code == 503, r.text
