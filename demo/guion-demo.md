@@ -3,7 +3,7 @@
 **Video:** 5–7 minutos · **Aplicación:** FactorUno, el mantenedor de calificaciones tributarias de dividendos que desarrollé para la empresa **nuam** (la bolsa), a partir de su HDU real. **Caso:** cierre de dividendos del ejercicio 2024.
 **Quién habla:** el autor del desarrollo, en primera persona. No se actúa como funcionario de nuam: se muestra la aplicación y se explica lo que hace.
 **Regla del profesor:** mostrar la aplicación, no disertar. Frases de 5–10 segundos.
-**Cómo leer esta guía:** cada toma dice, paso a paso, dónde hacer clic, qué escribir, qué decir y qué debe verse. Al final está el anexo con el uso completo de la app.
+**Cómo leer esta guía:** cada toma dice, paso a paso, dónde hacer clic, qué escribir, qué decir y qué debe verse. Al final está el anexo con el uso completo de la app. Y si alguna palabra no se entiende, está **`glosario.md`** en esta misma carpeta: la explica en simple.
 
 ## Antes de grabar
 
