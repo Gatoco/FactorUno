@@ -1,4 +1,5 @@
-**Video:** 5–7 minutos · **Caso:** cierre de dividendos del ejercicio 2024 en nuam
+**Video:** 5–7 minutos · **Caso:** cierre de dividendos del ejercicio 2024 (HDU real de nuam, usado como caso del ramo).
+**Quién habla:** el autor del desarrollo, en primera persona. No se actúa como funcionario de nuam: se muestra la aplicación y se explica lo que hace.
 **Regla del profesor:** mostrar la aplicación, no disertar. Frases de 5–10 segundos.
 **Cómo leer este documento:** una toma por página. Cada página dice qué hacer, qué escribir, qué decir y qué debe verse. No hay que buscar nada en otras páginas.
 
@@ -16,7 +17,7 @@
 
 **Hacer:** abrir `http://100.57.30.193/`, usuario `admin`, contraseña `Admin1234!`.
 
-**Decir:** "Trabajo en el área tributaria de nuam. Estamos cerrando los dividendos del ejercicio 2024: el SII entrega los certificados DJ 1948 y hay que dejar registrada la calificación de cada uno, con sus factores, la trazabilidad y el respaldo para contabilidad. Eso es lo que hace este mantenedor."
+**Decir:** "Esta es la aplicación que desarrollé para el caso de FactorUno, que sale del HDU de nuam: registrar la calificación de los dividendos del ejercicio 2024, con sus factores, la trazabilidad y el respaldo. Ya está publicada en la nube, así que la abro directo."
 
 **Ver:** la pantalla de login y después la grilla con los registros ya cargados.
 
@@ -43,7 +44,7 @@ Ejercicio `2024` · Mercado `CFI` · Instrumento `AGUAS ANDINAS S.A.` · Fecha d
 
 **Escribir (Montos):** columna 8 = `150000` · columna 12 = `50000`. Todo lo demás queda en 0.
 
-**Decir:** "Registro el certificado que llegó hoy. Los montos van agrupados por concepto de la homologación del SII."
+**Decir:** "Registro un certificado como ejemplo. Los montos van agrupados por concepto de la homologación del SII."
 
 **Ver:** el mensaje de guardado y el registro nuevo en la grilla.
 
@@ -79,21 +80,21 @@ Ejercicio `2024` · Mercado `CFI` · Instrumento `AGUAS ANDINAS S.A.` · Fecha d
 
 <div style="page-break-after: always;"></div>
 
-## Toma 7 — Previsualizar el archivo que devolvió el área
+## Toma 7 — Previsualizar un archivo con errores
 
 **Hacer:** botón **Carga de calificaciones** → Tipo de carga `Montos (DJ 1948)` → Archivo → elegir `carga-montos-demo-error.csv`.
 
-**Decir:** "Este archivo me lo devolvieron con problemas. Antes de grabar, el sistema lo previsualiza: me dice cuántos registros trae y qué línea está mal."
+**Decir:** "Este archivo tiene errores a propósito, para mostrar la validación. Antes de grabar, el sistema lo previsualiza: dice cuántos registros trae y qué línea está mal."
 
 **Ver:** la vista previa con 3 registros y la lista de avisos (fecha inválida, una fila con columnas de menos, tipo de sociedad inválido). Apretar **Cancelar**.
 
 <div style="page-break-after: always;"></div>
 
-## Toma 8 — Cargar el lote del período
+## Toma 8 — Cargar un lote de certificados
 
 **Hacer:** botón **Carga de calificaciones** → Tipo de carga `Montos (DJ 1948)` → Archivo → elegir `carga-montos-demo.csv` → botón **Confirmar carga (3)**.
 
-**Decir:** "Este es el lote correcto del período: tres certificados, identificados por llave."
+**Decir:** "Ahora el mismo formato con datos válidos: tres certificados identificados por llave, así la carga actualiza en vez de duplicar."
 
 **Ver:** el mensaje "Carga OK: 3 insertados" y los 3 registros nuevos en la grilla.
 
@@ -103,7 +104,7 @@ Ejercicio `2024` · Mercado `CFI` · Instrumento `AGUAS ANDINAS S.A.` · Fecha d
 
 **Hacer:** botón **Exportar** → **JSON**.
 
-**Decir:** "Genero el respaldo del período: se publica en S3 y devuelve una URL firmada, que es la que le mando a contabilidad."
+**Decir:** "El respaldo se publica en S3 y el sistema devuelve una URL firmada que dura una hora, para compartirlo sin dar acceso al bucket."
 
 **Ver:** el modal con el nombre del archivo y el bucket; después la descarga del JSON en una pestaña nueva.
 
@@ -113,7 +114,7 @@ Ejercicio `2024` · Mercado `CFI` · Instrumento `AGUAS ANDINAS S.A.` · Fecha d
 
 **Hacer:** **Salir** → entrar con `analista` / `Analista1234!` → achicar la ventana hasta unos 390 px de ancho (o abrir la misma dirección en el teléfono).
 
-**Decir:** "Desde el teléfono reviso lo mismo: la grilla se convierte en tarjetas y el formulario se apila en una columna. El repositorio, el informe y la solución en la nube están en el documento de entrega."
+**Decir:** "La misma aplicación en pantalla chica: la grilla se convierte en tarjetas y el formulario se apila en una columna. Con esto cierro la demo; el repositorio, el informe y la solución en la nube están en el documento de entrega."
 
 **Ver:** la grilla como tarjetas (etiqueta a la izquierda, valor a la derecha) y el formulario de ingreso en una sola columna.
 
