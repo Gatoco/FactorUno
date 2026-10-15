@@ -118,7 +118,7 @@ export default function App() {
                   <td data-l="Origen" className="dim">{f.origen}</td><td data-l="Fuente" className="dim">{f.fuente}</td>
                   <td data-l="Acciones" className="acciones">
                     <button onClick={async () => { setDetalle(await api.obtener(f.id)) }}>Ver</button>
-                    {puedeEscribir && <button onClick={() => setModal({ modo: 'editar', id: f.id, form: convertirForm(f) })}>Modificar</button>}
+                    {puedeEscribir && <button onClick={async () => { setModal({ modo: 'editar', id: f.id, form: convertirForm(await api.obtener(f.id)) }) }}>Modificar</button>}
                     {puedeEscribir && <button className="peligro" onClick={async () => { if (confirm(`¿Eliminar ${f.instrumento} ej.${f.ejercicio}?`)) { await api.eliminar(f.id); cargar(); mostrarAviso('Eliminada') } }}>Eliminar</button>}
                   </td>
                 </tr>
@@ -170,7 +170,7 @@ function Filtros({ filtros, setFiltros, onBuscar, onLimpiar }) {
       <label>Período comercial
         <input type="number" value={filtros.periodo} onChange={(e) => setFiltros({ ...filtros, periodo: e.target.value })} placeholder="2025" />
       </label>
-      <button className="btn prim" onClick={onBuscar}>Buscar</button>
+      <button className="btn prim" onClick={() => onBuscar()}>Buscar</button>
       <button className="btn" onClick={onLimpiar}>Limpiar</button>
     </div>
   )
