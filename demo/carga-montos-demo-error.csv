@@ -1,0 +1,4 @@
+ejercicio,mercado,instrumento,fecha,secuencia,numero_dividendo,tipo_sociedad,valor_historico,monto_8,monto_9,monto_10,monto_11,monto_12,monto_13,monto_14,monto_15,monto_16,monto_17,monto_18,monto_19
+2024,ACN,DEMO FECHA MAL ESCRITA,13/13/2024,7,555,A,1000,100,200,50,10,0,0,0,0,0,0,0,0
+2024,FM,DEMO COLUMNAS DE MENOS,2024-06-01,3,777,A,2500,0,0,300
+2024,CFI,DEMO TIPO SOCIEDAD INVALIDO,2024-07-01,4,999,Z,800,10,20,30,5,0,0,0,0,0,0,0,5
