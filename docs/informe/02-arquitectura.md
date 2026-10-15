@@ -86,7 +86,7 @@ flowchart LR
     SERV -->|"exportes JSON/CSV + URL firmada"| S3
 ```
 
-> `*` DynamoDB y Amazon S3 corresponden a la base no estructurada prevista en la Evaluación 2; la aplicación degrada de forma limpia si no están configurados.
+> DynamoDB y Amazon S3 corresponden a la **base no estructurada** de la Evaluación 2 y están implementadas en `backend/app/aws_ext.py`; se activan por variables de entorno al desplegar y la aplicación degrada de forma limpia cuando no están configuradas.
 
 El **backend** se organiza en cuatro módulos: `main.py` expone la API REST y valida la entrada con modelos Pydantic; `servicio.py` concentra las operaciones de negocio (listar, crear, modificar, eliminar, calcular, cargar CSV, auditar); `reglas.py` aplica las reglas del HDU (cálculo de factores, redondeo, validación de suma y tipo de sociedad); y `db.py` define el esquema y las conexiones. El **frontend** replica esa separación con `App.jsx` (pantalla principal), `api.js` (comunicación con el backend) y `columnas.js` (etiquetas y cálculo de la suma base).
 

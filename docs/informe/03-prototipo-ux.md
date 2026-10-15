@@ -8,9 +8,10 @@ El prototipo se construyó con la misma tecnología del producto final (**React 
 2. **Grilla de calificaciones** con filtros por mercado, origen y período.
 3. **Detalle de un registro** con sus montos y factores calculados.
 4. **Ingreso manual** de una calificación (datos básicos + 29 montos).
-5. **Carga masiva** por archivo CSV.
-6. **Cálculo automático** de factores con redondeo a 8 decimales.
+5. **Carga masiva** por archivo CSV, con **previsualización y validación de formato** antes de grabar.
+6. **Cálculo automático** de factores con redondeo a 8 decimales; la suma base (columnas 8–19) se muestra en vivo y alerta si supera 1.
 7. **Auditoría** de todas las operaciones (creación, modificación, eliminación, cálculo y carga).
+8. **Exportación** del respaldo completo (JSON o CSV) publicada en S3 con URL firmada temporal.
 
 Las siguientes capturas corresponden a la aplicación ejecutándose:
 
@@ -21,8 +22,12 @@ Las siguientes capturas corresponden a la aplicación ejecutándose:
 | 3 | Detalle del registro | Montos por columna y factores calculados (8 decimales, suma ≤ 1). |
 | 4 | Auditoría | Historial de operaciones con usuario, acción, registro y fecha. |
 | 5 | Ingreso manual | Formulario de datos básicos del certificado. |
-| 6 | Montos | Pestaña de los 29 montos por columna (8–36). |
-| 7 | Vista móvil | Adaptabilidad en pantalla de teléfono (390 × 844). |
+| 6 | Montos | Pestaña de los 29 montos por columna (8–36), agrupados por concepto de la homologación SII. |
+| 7 | Vista móvil (grilla) | La grilla se convierte en tarjetas en pantalla de teléfono (390 × 962). |
+| 8 | Factores | Factores calculados con la suma base (8–19) en vivo y alerta si supera 1. |
+| 9 | Previsualización de carga | Validación del CSV antes de grabar: registros, columnas y avisos por fila. |
+| 10 | Exportación | Respaldo JSON/CSV publicado en S3 con URL firmada. |
+| 11 | Vista móvil (formulario) | El modal de ingreso se apila en una columna, con la etiqueta sobre cada campo. |
 
 ![Inicio de sesión](img/01-login.png)
 
@@ -36,6 +41,12 @@ Las siguientes capturas corresponden a la aplicación ejecutándose:
 
 ![Pestaña de montos (29 columnas)](img/06-montos.png)
 
+![Pestaña de factores con la suma base en vivo](img/08-factores.png)
+
+![Previsualización de la carga masiva con avisos por fila](img/09-carga-previa.png)
+
+![Exportación del respaldo con URL firmada](img/10-exportar.png)
+
 ## 2.1.3.6 Consistencia visual y adaptabilidad
 
 La interfaz aplica un **sistema de diseño único** en todas las vistas, lo que garantiza consistencia visual:
@@ -45,16 +56,18 @@ La interfaz aplica un **sistema de diseño único** en todas las vistas, lo que 
 - **Componentes reutilizables**: botones, tarjetas, modales (detalle, ingreso, montos), tablas y pestañas mantienen el mismo aspecto y comportamiento en toda la aplicación.
 - **Retroalimentación**: mensajes de error del backend se muestran al usuario sin ambigüedad (por ejemplo, al intentar ingresar sin sesión o al enviar datos inválidos).
 
-La **adaptabilidad** está resuelta con una hoja de estilos responsiva: la barra de navegación, la grilla y los formularios se reordenan y apilan en pantallas pequeñas. La captura 7 demuestra la aplicación renderizada en un viewport móvil (390 × 844 px), manteniendo legibilidad y operabilidad de las acciones principales.
+La **adaptabilidad** está resuelta con una hoja de estilos responsiva con dos puntos de quiebre: en pantallas pequeñas la barra de navegación y los formularios se apilan en una sola columna y, bajo 560 px, la grilla abandona el desplazamiento horizontal y se convierte en **tarjetas**, una por calificación, con la etiqueta de cada campo al costado del valor. Las capturas 7 y 11 demuestran la aplicación renderizada en un viewport móvil (390 × 962 px) —la grilla como tarjetas y el modal de ingreso apilado—, manteniendo legibilidad y operabilidad de las acciones principales.
 
 | Aspecto | Criterio aplicado | Evidencia |
 |---------|-------------------|-----------|
 | Consistencia tipográfica | Jerarquías únicas en todas las vistas | Capturas 1–6 |
 | Consistencia de color | Paleta institucional única (azul primario, rojo de acento, fondo crema) en todas las vistas | Capturas 2, 3, 6 |
 | Consistencia de componentes | Modales, tablas y botones homogéneos | Capturas 3, 5, 6 |
-| Adaptabilidad | Layout responsivo usable en móvil | Captura 7 |
+| Adaptabilidad | Layout responsivo usable en móvil (grilla en tarjetas y formularios apilados) | Capturas 7, 11 |
 
-![Vista móvil (390 × 844 px)](img/07-movil.png)
+![Vista móvil de la grilla en tarjetas (390 × 962 px)](img/07-movil.png)
+
+![Formulario de ingreso apilado en móvil](img/11-movil-form.png)
 
 ## 2.1.3.7 Retroalimentación de usuarios
 

@@ -55,7 +55,7 @@ erDiagram
 |-------|----------------|
 | Clave primaria de negocio | Índice `UNIQUE` sobre (ejercicio, mercado, instrumento, fecha_pago, secuencia, numero_dividendo, tipo_sociedad): impide duplicar un certificado; habilita el *upsert* de la carga masiva. |
 | Integridad referencial | `montos` y `factores` referencian a `calificaciones` con `FOREIGN KEY … ON DELETE CASCADE`; `PRAGMA foreign_keys=ON` en cada conexión. |
-| Dominios cerrados | `CHECK` para `mercado` (1–3), `tipo_sociedad` (A/C), `origen` (corredor/entidad), `fuente` (manual/archivo/sistema) y rango de columna de montos/factores (8–37). |
+| Dominios cerrados | `CHECK` para `mercado` (1–3), `tipo_sociedad` (A/C), `origen` (corredor/entidad), `fuente` (manual/archivo/sistema) y rango de columna de montos (8–36) y de factores (8–37). |
 | Integridad de negocio | La suma de factores de las columnas 8 a 19 no puede superar 1 (validado por la aplicación, con tolerancia de 1e-8) y los factores se redondean a 8 decimales (`ROUND_HALF_UP`). |
 | Trazabilidad | Toda operación de creación, modificación, eliminación, cálculo y carga escribe un evento en `auditoria` con el usuario autenticado. |
 | Concurrencia y durabilidad | SQLite en modo **WAL** (`journal_mode=WAL`), transacciones por operación. |

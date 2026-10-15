@@ -67,8 +67,8 @@ flowchart TD
 
 | Control | Comando / evidencia |
 |---|---|
-| Suite completa | `cd backend && .venv/bin/python -m pytest tests/ -q` → **90 passed** |
-| Cobertura | `--cov=app` → **96 %** (reglas 100 %, auth 94 %, servicio 96 %) |
+| Suite completa | `cd backend && .venv/bin/python -m pytest tests/ -q` → **99 passed** |
+| Cobertura | `--cov=app` → **94 %** (reglas 100 %, servicio 97 %, main 96 %, auth 92 %, db 90 %, aws_ext 82 %) |
 | Casos de seguridad | 16 pruebas de autenticación/autorización (401/403/roles) |
 | Integridad de carga | Carga CSV idempotente por llave de negocio probada (`test_carga_csv_inserta_y_es_idempotente_por_llave`) |
 | Auditoría | Usuario real registrado en cada evento (`test_auditoria_registra_insert_update_delete`) |

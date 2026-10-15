@@ -30,7 +30,7 @@ Este documento es la **Evaluación 2 (sumativa)** del ramo Proyecto Integrado y 
 
 El proyecto es el **Mantenedor de Calificaciones Tributarias (FactorUno)** solicitado por **nuam**: una aplicación web que consolida las calificaciones tributarias de los corredores, calcula factores a partir de los montos de dividendos y mantiene trazabilidad completa de las operaciones.
 
-Respecto de la Evaluación 1, esta entrega incorpora: **autenticación y autorización con roles** (2.1.5.10), **análisis de amenazas y mitigación** (2.1.5.11), **estándares de codificación segura aplicados** (2.1.5.12), una **suite de 98 pruebas automatizadas** unitarias, integrales y de rendimiento con 96% de cobertura (2.1.6.13–2.1.6.14), uso de **base no estructurada** (DynamoDB y S3) además de SQLite (2.1.4.9), y el **despliegue en la nube** (AWS) verificable por el profesor. El prototipo ya era interactivo en la entrega anterior (2.1.3.5); aquí se documenta con capturas reales de la aplicación en funcionamiento.
+Respecto de la Evaluación 1, esta entrega incorpora: **autenticación y autorización con roles** (2.1.5.10), **análisis de amenazas y mitigación** (2.1.5.11), **estándares de codificación segura aplicados** (2.1.5.12), una **suite de 99 pruebas automatizadas** unitarias, integrales y de rendimiento con 94% de cobertura (2.1.6.13–2.1.6.14), uso de **base no estructurada** (DynamoDB y S3) además de SQLite (2.1.4.9), y el **despliegue en la nube** (AWS) verificable por el profesor. El prototipo ya era interactivo en la entrega anterior (2.1.3.5); aquí se documenta con capturas reales de la aplicación en funcionamiento.
 
 ## Índice
 
@@ -213,7 +213,7 @@ Describe los componentes de software y sus relaciones. La separación en capas m
 
 ![Diagrama 5](img/diag_5.png)
 
-> `*` DynamoDB y Amazon S3 corresponden a la base no estructurada prevista en la Evaluación 2; la aplicación degrada de forma limpia si no están configurados.
+> DynamoDB y Amazon S3 corresponden a la **base no estructurada** de la Evaluación 2 y están implementadas en `backend/app/aws_ext.py`; se activan por variables de entorno al desplegar y la aplicación degrada de forma limpia cuando no están configuradas.
 
 El **backend** se organiza en cuatro módulos: `main.py` expone la API REST y valida la entrada con modelos Pydantic; `servicio.py` concentra las operaciones de negocio (listar, crear, modificar, eliminar, calcular, cargar CSV, auditar); `reglas.py` aplica las reglas del HDU (cálculo de factores, redondeo, validación de suma y tipo de sociedad); y `db.py` define el esquema y las conexiones. El **frontend** replica esa separación con `App.jsx` (pantalla principal), `api.js` (comunicación con el backend) y `columnas.js` (etiquetas y cálculo de la suma base).
 
@@ -305,9 +305,10 @@ El prototipo se construyó con la misma tecnología del producto final (**React 
 2. **Grilla de calificaciones** con filtros por mercado, origen y período.
 3. **Detalle de un registro** con sus montos y factores calculados.
 4. **Ingreso manual** de una calificación (datos básicos + 29 montos).
-5. **Carga masiva** por archivo CSV.
-6. **Cálculo automático** de factores con redondeo a 8 decimales.
+5. **Carga masiva** por archivo CSV, con **previsualización y validación de formato** antes de grabar.
+6. **Cálculo automático** de factores con redondeo a 8 decimales; la suma base (columnas 8–19) se muestra en vivo y alerta si supera 1.
 7. **Auditoría** de todas las operaciones (creación, modificación, eliminación, cálculo y carga).
+8. **Exportación** del respaldo completo (JSON o CSV) publicada en S3 con URL firmada temporal.
 
 Las siguientes capturas corresponden a la aplicación ejecutándose:
 
@@ -318,8 +319,12 @@ Las siguientes capturas corresponden a la aplicación ejecutándose:
 | 3 | Detalle del registro | Montos por columna y factores calculados (8 decimales, suma ≤ 1). |
 | 4 | Auditoría | Historial de operaciones con usuario, acción, registro y fecha. |
 | 5 | Ingreso manual | Formulario de datos básicos del certificado. |
-| 6 | Montos | Pestaña de los 29 montos por columna (8–36). |
-| 7 | Vista móvil | Adaptabilidad en pantalla de teléfono (390 × 844). |
+| 6 | Montos | Pestaña de los 29 montos por columna (8–36), agrupados por concepto de la homologación SII. |
+| 7 | Vista móvil (grilla) | La grilla se convierte en tarjetas en pantalla de teléfono (390 × 962). |
+| 8 | Factores | Factores calculados con la suma base (8–19) en vivo y alerta si supera 1. |
+| 9 | Previsualización de carga | Validación del CSV antes de grabar: registros, columnas y avisos por fila. |
+| 10 | Exportación | Respaldo JSON/CSV publicado en S3 con URL firmada. |
+| 11 | Vista móvil (formulario) | El modal de ingreso se apila en una columna, con la etiqueta sobre cada campo. |
 
 ![Inicio de sesión](img/01-login.png)
 
@@ -333,6 +338,12 @@ Las siguientes capturas corresponden a la aplicación ejecutándose:
 
 ![Pestaña de montos (29 columnas)](img/06-montos.png)
 
+![Pestaña de factores con la suma base en vivo](img/08-factores.png)
+
+![Previsualización de la carga masiva con avisos por fila](img/09-carga-previa.png)
+
+![Exportación del respaldo con URL firmada](img/10-exportar.png)
+
 ## 2.1.3.6 Consistencia visual y adaptabilidad
 
 La interfaz aplica un **sistema de diseño único** en todas las vistas, lo que garantiza consistencia visual:
@@ -342,16 +353,18 @@ La interfaz aplica un **sistema de diseño único** en todas las vistas, lo que 
 - **Componentes reutilizables**: botones, tarjetas, modales (detalle, ingreso, montos), tablas y pestañas mantienen el mismo aspecto y comportamiento en toda la aplicación.
 - **Retroalimentación**: mensajes de error del backend se muestran al usuario sin ambigüedad (por ejemplo, al intentar ingresar sin sesión o al enviar datos inválidos).
 
-La **adaptabilidad** está resuelta con una hoja de estilos responsiva: la barra de navegación, la grilla y los formularios se reordenan y apilan en pantallas pequeñas. La captura 7 demuestra la aplicación renderizada en un viewport móvil (390 × 844 px), manteniendo legibilidad y operabilidad de las acciones principales.
+La **adaptabilidad** está resuelta con una hoja de estilos responsiva con dos puntos de quiebre: en pantallas pequeñas la barra de navegación y los formularios se apilan en una sola columna y, bajo 560 px, la grilla abandona el desplazamiento horizontal y se convierte en **tarjetas**, una por calificación, con la etiqueta de cada campo al costado del valor. Las capturas 7 y 11 demuestran la aplicación renderizada en un viewport móvil (390 × 962 px) —la grilla como tarjetas y el modal de ingreso apilado—, manteniendo legibilidad y operabilidad de las acciones principales.
 
 | Aspecto | Criterio aplicado | Evidencia |
 |---------|-------------------|-----------|
 | Consistencia tipográfica | Jerarquías únicas en todas las vistas | Capturas 1–6 |
 | Consistencia de color | Paleta institucional única (azul primario, rojo de acento, fondo crema) en todas las vistas | Capturas 2, 3, 6 |
 | Consistencia de componentes | Modales, tablas y botones homogéneos | Capturas 3, 5, 6 |
-| Adaptabilidad | Layout responsivo usable en móvil | Captura 7 |
+| Adaptabilidad | Layout responsivo usable en móvil (grilla en tarjetas y formularios apilados) | Capturas 7, 11 |
 
-![Vista móvil (390 × 844 px)](img/07-movil.png)
+![Vista móvil de la grilla en tarjetas (390 × 962 px)](img/07-movil.png)
+
+![Formulario de ingreso apilado en móvil](img/11-movil-form.png)
 
 ## 2.1.3.7 Retroalimentación de usuarios
 
@@ -389,7 +402,7 @@ El modelo de datos del mantenedor es relacional y está implementado en **SQLite
 |-------|----------------|
 | Clave primaria de negocio | Índice `UNIQUE` sobre (ejercicio, mercado, instrumento, fecha_pago, secuencia, numero_dividendo, tipo_sociedad): impide duplicar un certificado; habilita el *upsert* de la carga masiva. |
 | Integridad referencial | `montos` y `factores` referencian a `calificaciones` con `FOREIGN KEY … ON DELETE CASCADE`; `PRAGMA foreign_keys=ON` en cada conexión. |
-| Dominios cerrados | `CHECK` para `mercado` (1–3), `tipo_sociedad` (A/C), `origen` (corredor/entidad), `fuente` (manual/archivo/sistema) y rango de columna de montos/factores (8–37). |
+| Dominios cerrados | `CHECK` para `mercado` (1–3), `tipo_sociedad` (A/C), `origen` (corredor/entidad), `fuente` (manual/archivo/sistema) y rango de columna de montos (8–36) y de factores (8–37). |
 | Integridad de negocio | La suma de factores de las columnas 8 a 19 no puede superar 1 (validado por la aplicación, con tolerancia de 1e-8) y los factores se redondean a 8 decimales (`ROUND_HALF_UP`). |
 | Trazabilidad | Toda operación de creación, modificación, eliminación, cálculo y carga escribe un evento en `auditoria` con el usuario autenticado. |
 | Concurrencia y durabilidad | SQLite en modo **WAL** (`journal_mode=WAL`), transacciones por operación. |
@@ -646,8 +659,8 @@ Limitación conocida: no hay *rate limiting* en el login (ver §5).
 
 | Control | Comando / evidencia |
 |---|---|
-| Suite completa | `cd backend && .venv/bin/python -m pytest tests/ -q` → **90 passed** |
-| Cobertura | `--cov=app` → **96 %** (reglas 100 %, auth 94 %, servicio 96 %) |
+| Suite completa | `cd backend && .venv/bin/python -m pytest tests/ -q` → **99 passed** |
+| Cobertura | `--cov=app` → **94 %** (reglas 100 %, servicio 97 %, main 96 %, auth 92 %, db 90 %, aws_ext 82 %) |
 | Casos de seguridad | 16 pruebas de autenticación/autorización (401/403/roles) |
 | Integridad de carga | Carga CSV idempotente por llave de negocio probada (`test_carga_csv_inserta_y_es_idempotente_por_llave`) |
 | Auditoría | Usuario real registrado en cada evento (`test_auditoria_registra_insert_update_delete`) |
@@ -671,10 +684,10 @@ El plan de pruebas cubre los tres niveles solicitados por la rúbrica, con resul
 | Nivel | Objetivo | Alcance | Resultado |
 |-------|----------|---------|-----------|
 | Unitarias | Reglas de negocio puras | `app/reglas.py`: redondeo a 8 decimales, cálculo y validación de factores, normalización de fecha, tipo de sociedad, mapeo de filas CSV | **62 casos — 100% OK** |
-| Integrales | API completa con autenticación y base real (SQLite temporal) | Login y matriz de roles (16), flujo CRUD completo, cálculo automático, filtros, carga CSV (idempotencia y errores por fila), auditoría, exportes S3 (8) y espejado DynamoDB | **33 casos — 100% OK** |
+| Integrales | API completa con autenticación y base real (SQLite temporal) | Login y matriz de roles (16), flujo CRUD completo, cálculo automático, filtros, carga CSV (idempotencia y errores por fila), auditoría, exportes S3 (9) y espejado DynamoDB | **34 casos — 100% OK** |
 | Rendimiento | Tiempos sobre volumen representativo | Carga masiva CSV de **500 registros**, listado de 500 registros y cálculo de factores | **0,11 s / 0,03 s / 0,004 s** |
 
-**Total: 98 pruebas automatizadas, 100% exitosas.**
+**Total: 99 pruebas automatizadas, 100% exitosas.**
 
 ### Resultados por archivo de prueba
 
@@ -683,7 +696,7 @@ El plan de pruebas cubre los tres niveles solicitados por la rúbrica, con resul
 | `tests/test_reglas.py` | 62 | Funciones puras de reglas de negocio (parametrizadas por caso). |
 | `tests/test_auth.py` | 16 | `401` sin token / token inválido, login por rol, matriz de permisos completa, auditoría con usuario real. |
 | `tests/test_servicio.py` | 9 | Flujo integral CRUD vía API, recálculo de factores, filtros, carga CSV idempotente, errores por fila, auditoría de escrituras. |
-| `tests/test_aws_ext.py` | 8 | Espejo de auditoría a DynamoDB (tipos y contenido), exportes JSON/CSV a S3 (URL firmada), `503` sin bucket, `403` por rol. |
+| `tests/test_aws_ext.py` | 9 | Espejo de auditoría a DynamoDB (tipos y contenido), exportes JSON/CSV a S3 (URL firmada), `503` sin bucket, `403` por rol. |
 | `tests/test_perf.py` | 3 | Umbrales de tiempo de carga masiva, listado y cálculo. |
 
 ### Cobertura de código
@@ -693,11 +706,12 @@ Ejecutada con `pytest-cov` sobre `app/`:
 | Módulo | Cobertura |
 |--------|:---------:|
 | `reglas.py` | 100% |
-| `db.py` | 96% |
-| `servicio.py` | 96% |
-| `main.py` | 95% |
-| `auth.py` | 94% |
-| **Total** | **96%** |
+| `servicio.py` | 97% |
+| `main.py` | 96% |
+| `auth.py` | 92% |
+| `db.py` | 90% |
+| `aws_ext.py` | 82% |
+| **Total** | **94%** |
 
 ### Rendimiento medido (pytest + `-s`)
 
@@ -711,7 +725,7 @@ Ejecutada con `pytest-cov` sobre `app/`:
 
 ```bash
 cd backend
-.venv/bin/python -m pytest tests/ -q                          # 98 pruebas
+.venv/bin/python -m pytest tests/ -q                          # 99 pruebas
 .venv/bin/python -m pytest tests/ -q --cov=app --cov-report=term-missing
 .venv/bin/python -m pytest tests/test_perf.py -s              # tiempos impresos
 ```
@@ -726,8 +740,8 @@ La estrategia combina herramientas **automatizadas** (regresión continua) y **m
 
 | Herramienta | Uso en el proyecto |
 |-------------|--------------------|
-| **pytest** | Framework de pruebas: 98 casos (unitarias, integrales y rendimiento). |
-| **pytest-cov** | Medición de cobertura de código (96%). |
+| **pytest** | Framework de pruebas: 99 casos (unitarias, integrales y rendimiento). |
+| **pytest-cov** | Medición de cobertura de código (94%). |
 | **httpx / TestClient** | Cliente HTTP de las pruebas integrales contra la API real (con autenticación). |
 | **boto3 (mockeado)** | Verificación del espejo DynamoDB y de los exportes S3 sin consumir AWS. |
 | **Script de rendimiento** | Generador de 500 registros CSV con umbrales de tiempo como aserción. |
@@ -739,7 +753,7 @@ La estrategia combina herramientas **automatizadas** (regresión continua) y **m
 |------------------|---------------|-----------|
 | Checklist funcional | Recorrido guiado del flujo principal en la interfaz real | Ejecutado — flujo completo OK |
 | Verificación de la matriz de roles en UI | Sesión con rol `consulta` (solo lectura) vs `analista` | Ejecutado — acciones ocultas/deshabilitadas y API responde `403` |
-| Revisión visual y responsiva | Revisión de consistencia y captura en viewport móvil 390×844 | Ejecutado — sin quiebres de layout |
+| Revisión visual y responsiva | Revisión de consistencia y captura en viewport móvil 390 × 962 | Ejecutado — sin quiebres de layout |
 | Revisión cruzada de errores | Envío de datos inválidos (fecha, tipo de sociedad, suma de factores > 1) | Ejecutado — mensajes claros por fila/campo |
 
 ### Justificación del balance
