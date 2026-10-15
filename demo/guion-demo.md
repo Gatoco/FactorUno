@@ -1,6 +1,6 @@
 # FactorUno — guía única (video + uso de la app)
 
-**Video:** 5–7 minutos · **Caso:** cierre de dividendos del ejercicio 2024 (HDU real de nuam, usado como caso del ramo).
+**Video:** 5–7 minutos · **Aplicación:** FactorUno, el mantenedor de calificaciones tributarias de dividendos que desarrollé para la empresa **nuam** (la bolsa), a partir de su HDU real. **Caso:** cierre de dividendos del ejercicio 2024.
 **Quién habla:** el autor del desarrollo, en primera persona. No se actúa como funcionario de nuam: se muestra la aplicación y se explica lo que hace.
 **Regla del profesor:** mostrar la aplicación, no disertar. Frases de 5–10 segundos.
 **Cómo leer esta guía:** cada toma dice qué hacer, qué escribir, qué decir y qué debe verse. Al final está el anexo con el uso completo de la app.
@@ -37,7 +37,7 @@ Esta sección es solo para preparar la grabación: no se lee en cámara.
 
 **Hacer:** abrir `http://100.57.30.193/`, usuario `admin`, contraseña `Admin1234!`.
 
-**Decir:** "Esta es la aplicación que desarrollé para el caso de FactorUno, que sale del HDU de nuam: registrar la calificación de los dividendos del ejercicio 2024, con sus factores, la trazabilidad y el respaldo. Ya está publicada en la nube, así que la abro directo."
+**Decir:** "Esta es FactorUno, la aplicación que desarrollé para la empresa nuam, la bolsa: registra la calificación de los dividendos del ejercicio 2024, con sus factores, la trazabilidad y el respaldo. Ya está publicada en la nube, así que la abro directo."
 
 **Ver:** la pantalla de login y, al entrar, la grilla (todavía vacía: los certificados se cargan en la toma 4).
 
