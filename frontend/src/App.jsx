@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { api, getToken, guardarSesion, limpiarSesion } from './api.js'
 import { LABELS, MONTOS_COLS, BASE_COLS, formatFecha, sumaBase } from './columnas.js'
 import './styles.css'
@@ -96,6 +96,7 @@ export default function App() {
               <CargaCsv onResultado={(r) => { cargar(); mostrarAviso(`Carga OK: ${r.insertados} insertados, ${r.actualizados} actualizados${r.errores?.length ? `, ${r.errores.length} errores` : ''}`) }} />
             </div>
           )}
+          <div className="tabla-marco">
           <table className="grilla">
             <thead>
               <tr>
@@ -105,15 +106,15 @@ export default function App() {
               </tr>
             </thead>
             <tbody>
-              {cargando && <tr><td colSpan={11} className="centro">Cargando…</td></tr>}
+              {cargando && <tr><td colSpan={11} className="centro"><span className="spinner" aria-hidden="true"></span>Cargando…</td></tr>}
               {!cargando && filas.length === 0 && <tr><td colSpan={11} className="centro">Sin calificaciones. Usa «Ingresar» o carga un CSV.</td></tr>}
               {filas.map((f) => (
                 <tr key={f.id}>
-                  <td>{f.ejercicio}</td><td>{f.mercado}</td><td>{f.instrumento}</td>
-                  <td>{formatFecha(f.fecha_pago)}</td><td>{f.secuencia}</td><td>{f.numero_dividendo}</td>
-                  <td>{f.tipo_sociedad}</td>
-                  <td>{f.isfut ? 'Sí' : ''}</td>
-                  <td>{f.origen}</td><td>{f.fuente}</td>
+                  <td className="num">{f.ejercicio}</td><td>{f.mercado}</td><td>{f.instrumento}</td>
+                  <td className="num">{formatFecha(f.fecha_pago)}</td><td className="num">{f.secuencia}</td><td className="num">{f.numero_dividendo}</td>
+                  <td><span className={f.tipo_sociedad === 'A' ? 'tag tag-a' : 'tag tag-c'} title={f.tipo_sociedad === 'A' ? 'Sociedad abierta' : 'Sociedad cerrada'}>{f.tipo_sociedad}</span></td>
+                  <td>{f.isfut ? <span className="tag tag-ok">Sí</span> : <span className="vacio">—</span>}</td>
+                  <td className="dim">{f.origen}</td><td className="dim">{f.fuente}</td>
                   <td className="acciones">
                     <button onClick={async () => { setDetalle(await api.obtener(f.id)) }}>Ver</button>
                     {puedeEscribir && <button onClick={() => setModal({ modo: 'editar', id: f.id, form: convertirForm(f) })}>Modificar</button>}
@@ -123,6 +124,7 @@ export default function App() {
               ))}
             </tbody>
           </table>
+          </div>
         </>
       ) : (
         <Auditoria />
@@ -182,8 +184,9 @@ function CargaCsv({ onResultado }) {
     <>
       <button className="btn" onClick={() => setAbierto(!abierto)}>Carga de calificaciones</button>
       {abierto && (
-        <div className="modal">
+        <div className="modal" role="dialog" aria-modal="true">
           <div className="modal-caja">
+            <button className="modal-x" aria-label="Cerrar" onClick={() => setAbierto(false)}>×</button>
             <h2>Cargar archivo (CSV)</h2>
             <label>Tipo de carga
               <select value={tipo} onChange={(e) => setTipo(e.target.value)}>
@@ -245,8 +248,9 @@ function ModalCalificacion({ modal, onClose, onGuardado }) {
   }
 
   return (
-    <div className="modal">
+    <div className="modal" role="dialog" aria-modal="true">
       <div className="modal-caja ancha">
+        <button className="modal-x" aria-label="Cerrar" onClick={onClose}>×</button>
         <h2>{modal.modo === 'crear' ? 'Ingresar Calificación' : `Modificar Calificación #${modal.id}`}</h2>
         <div className="pestanas">
           <button className={pestana === 'basicos' ? 'tab act' : 'tab'} onClick={() => setPestana('basicos')}>Datos básicos</button>
@@ -312,8 +316,9 @@ function ModalCalificacion({ modal, onClose, onGuardado }) {
 function ModalDetalle({ detalle, onClose, onCalcular, puedeEscribir }) {
   const suma = sumaBase(detalle.factores || {})
   return (
-    <div className="modal">
+    <div className="modal" role="dialog" aria-modal="true">
       <div className="modal-caja ancha">
+        <button className="modal-x" aria-label="Cerrar" onClick={onClose}>×</button>
         <h2>{detalle.instrumento} — ej. {detalle.ejercicio} ({detalle.mercado})</h2>
         <p className="sub">Secuencia {detalle.secuencia} · N° div. {detalle.numero_dividendo} · {detalle.tipo_sociedad === 'A' ? 'Abierta' : 'Cerrada'} · ISFUT {detalle.isfut ? 'Sí' : 'No'} · Origen {detalle.origen} · Fuente {detalle.fuente}</p>
         <div className="resumen">
@@ -344,14 +349,16 @@ function Auditoria() {
   return (
     <div>
       <h2>Log de auditoría</h2>
+      <div className="tabla-marco">
       <table className="grilla">
         <thead><tr><th>#</th><th>Fecha</th><th>Acción</th><th>Registro</th><th>Detalle</th><th>Usuario</th></tr></thead>
         <tbody>
           {rows.map((r) => (
-            <tr key={r.id}><td>{r.id}</td><td>{r.fecha}</td><td>{r.accion}</td><td>{r.registro_id ?? ''}</td><td>{r.detalle}</td><td>{r.usuario}</td></tr>
+            <tr key={r.id}><td className="num">{r.id}</td><td className="num">{r.fecha}</td><td><span className={`tag accion-${String(r.accion || '').toLowerCase()}`}>{r.accion}</span></td><td className="num">{r.registro_id ?? ''}</td><td>{r.detalle}</td><td className="dim">{r.usuario}</td></tr>
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   )
 }
