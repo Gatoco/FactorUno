@@ -32,8 +32,8 @@
 | T9 | DynamoDB + S3: integración + ejemplo funcional | S6 | inline | ✅ hecho |
 | T10 | README/help + commits work-unit + push | S3 | inline | ✅ hecho |
 | T11 | Informe Ev2 ensamblado (rúbrica como títulos, gráficos) | S7, S8 + todo | inline | ✅ hecho |
-| T12 | Documento único de entrega con links | S9 | inline | ⬜ |
-| T13 | Re-despliegue AWS + verificación pública + datos (EIP/correo) | S9 | inline | ⬜ |
+| T12 | Documento único de entrega con links | S9 | inline | ✅ hecho |
+| T13 | Re-despliegue AWS + verificación pública + datos (EIP/correo) | S9 | inline | ✅ hecho |
 | T14 | Video demo | S9 | **usuario** | ⬜ |
 
 ## Log
@@ -46,4 +46,6 @@
 
 **L4 (2026-10-15, evidencia T10):** Commits work-unit en `main`: `83f965b` test suite (98 pruebas, 96 %) → `5d0f286` feat(security) auth+hardening+AWS → `eac3d6d` docs (informe + seguridad + ODD). Push `d2078c0..eac3d6d`. README: credenciales demo, sección Pruebas, stack actualizado. Validación local E2E: uvicorn 127.0.0.1:8000 + vite 5173; sin token → 401; login 3 roles; 7 capturas Playwright (login, grilla, detalle, auditoría, ingreso, montos, móvil) en `docs/informe/img/`. Docker local no disponible (daemon apagado, sin sudo): `docker compose config -q` OK; build completo se valida en el despliegue AWS.
 
-**L5 (2026-10-15, evidencia T11):** Informe ensamblado `docs/informe/00-informe-ev2.md` (portada grupo t420 → solo Benjamín visible en AAI · introducción · índice con los 14 criterios evaluables · secciones 2.1.1–2.1.6 + anexo seguridad 2.1.5.11/12). 12 diagramas Mermaid renderizados a PNG (mermaid-cli) e incrustados; PDF final `FactorUno-Informe-Ev2.pdf` (42 págs, Letter, pandoc → chromium). Pendientes declarados en el informe: 2.1.3.7 retroalimentación — instrumento incluido, resultados de encuesta se anexan al cierre; 2.1.6.15 oral fuera de documento por diseño.
+**L5 (2026-10-15, evidencia T11):** Informe ensamblado `docs/informe/00-informe-ev2.md` (portada grupo t420 → solo Benjamín visible en AAI · introducción · índice con los 14 criterios evaluables · secciones 2.1.1–2.1.6 + anexo seguridad 2.1.5.11/12). 12 diagramas Mermaid renderizados a PNG (mermaid-cli) e incrustados; PDF final `FactorUno-Informe-Ev2.pdf` (42 págs, Letter, pandoc → chromium). Pendientes declarados en el informe: 2.1.3.7 retroalimentación — instrumento incluido, resultados de encuesta se anexan al cierre; 2.1.6.15 oral fuera de documento por diseño. Commit `b8ff20a` (29 archivos) pusheado.
+
+**L6 (2026-10-15, evidencia T12–T13):** Re-despliegue AWS en el lab (sesión iniciada por el usuario): DynamoDB `factoruno-auditoria` + S3 `factoruno-exportes-848962746029` creados; SG `factoruno-web` (`sg-0b25f701ec7d06390`, 22/80/443/8000); EC2 `i-0649b616541af80bb` (t3.small, RHEL 9.8, AMI `ami-0fec1400d2a5313ec`, perfil `LabInstanceProfile`, user-data actualizado con `.env`); EIP **100.57.30.193** (`eipalloc-0091e8dd809236171`). Bootstrap ~165 s → frontend 200, sin token 401, login 3 roles, CRUD + auditoría con usuario real. **Hallazgo corregido:** `docker-compose.yml` no pasaba `FACTORUNO_DYNAMO_TABLA`/`FACTORUNO_S3_BUCKET` al contenedor (edit T6 previo a T9) → commit **`bf4bdbe`** + parche al servidor; tras recrear backend: espejo DynamoDB verificado (scan Count=1, item `INSERT#3 CENCOSUD S.A. analista`) y exportes JSON (3 336 B) y CSV (473 B) descargados por URL firmada (GET 200). T12: `Entrega Ev2 — Proyecto Integrado (links).md` + PDF (3 págs) en el vault (repo, informe PDF, correo AWS, EIP, credenciales demo; video queda pendiente del usuario).
