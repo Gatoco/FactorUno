@@ -24,75 +24,108 @@ margin: 0 0.8em 0.2em -1.6em;
 vertical-align: middle;
 }
 </style>
-  <style type="text/css">@page {
-size: Letter;
-margin: 2.5cm 2.5cm 2.5cm 2.5cm;
+  <style type="text/css">
+:root {
+color-scheme: light dark;
+--fondo: #ffffff;
+--texto: #171c26;
+--suave: #4a5261;
+--linea: #e0dbcf;
+--linea-fuerte: #c9c2b2;
+--tarjeta: #faf9f6;
+--acento: #a4161a;
+--acento-bg: #fbeaea;
+--foco: #fff6d0;
+--foco-2: #ffe066;
 }
-body {
-font-family: "Times New Roman", Times, serif;
-font-size: 12pt;
-line-height: 1.6;
-color: #000;
-margin: 0;
+@media (prefers-color-scheme: dark) {
+:root {
+--fondo: #14171c;
+--texto: #e9eaec;
+--suave: #a8adb8;
+--linea: #2b313b;
+--linea-fuerte: #3a4250;
+--tarjeta: #1b2027;
+--acento: #ff8b8b;
+--acento-bg: #34191b;
+--foco: #4a3f16;
+--foco-2: #6f5c20;
 }
-h1, h2, h3, h4 {
-font-family: "Times New Roman", Times, serif;
-color: #000;
-break-after: avoid;
-page-break-after: avoid;
 }
-h1 { font-size: 20pt; text-align: center; margin-top: 0; }
-h2 { font-size: 16pt; border-bottom: 1px solid #000; padding-bottom: 4px; margin-top: 28px; break-after: avoid; page-break-after: avoid; }
-h3 { font-size: 13pt; margin-top: 18px; break-after: avoid; page-break-after: avoid; }
-h4 { font-size: 12pt; margin-top: 14px; break-after: avoid; page-break-after: avoid; }
-p, table { break-inside: auto; }
-p { text-align: justify; }
-
-table { break-inside: avoid; page-break-inside: avoid; }
-table {
-border-collapse: collapse;
-width: 100%;
-margin: 12px 0;
-font-size: 10.5pt;
-}
-th, td {
-border: 1px solid #000;
-padding: 6px 8px;
-text-align: left;
-vertical-align: top;
-}
-th { background-color: #f0f0f0; font-weight: bold; }
-blockquote {
-border-left: 3px solid #999;
-margin: 10px 0;
-padding-left: 12px;
-font-style: italic;
-}
-hr { border: none; border-top: 1px solid #000; margin: 20px 0; }
-ul, ol { margin: 8px 0 8px 24px; }
-li { margin-bottom: 4px; }
-strong { font-weight: bold; }
-
-img {
-max-width: 100%;
-height: auto;
-display: block;
-margin: 12px auto;
-break-inside: avoid;
-page-break-inside: avoid;
-}
-
 html { scroll-behavior: smooth; }
-h2, h3, h4 { scroll-margin-top: 16px; }
+body {
+max-width: 900px;
+margin: 0 auto;
+padding: 40px 22px 90px;
+background: var(--fondo);
+color: var(--texto);
+font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+font-size: 16px;
+line-height: 1.65;
+-webkit-font-smoothing: antialiased;
+}
+
+#title-block-header { margin-bottom: 8px; }
+h1.title {
+font-size: 30px;
+line-height: 1.25;
+margin: 0 0 4px;
+letter-spacing: -.01em;
+}
+h2 {
+font-size: 21px;
+margin: 46px 0 14px;
+padding-bottom: 8px;
+border-bottom: 2px solid var(--linea);
+}
+h3 {
+font-size: 17px;
+margin: 28px 0 8px;
+padding: 10px 14px;
+background: var(--tarjeta);
+border-left: 4px solid var(--acento);
+border-radius: 8px;
+scroll-margin-top: 24px;
+}
+h2 { scroll-margin-top: 24px; }
+p { margin: 10px 0; }
+ul, ol { margin: 10px 0 10px 22px; }
+li { margin-bottom: 4px; }
+a { color: var(--acento); }
+strong { color: var(--texto); }
+code {
+background: var(--tarjeta);
+border: 1px solid var(--linea);
+border-radius: 5px;
+padding: 1px 6px;
+font-family: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+font-size: .92em;
+}
+blockquote {
+margin: 14px 0;
+padding: 10px 16px;
+background: var(--tarjeta);
+border-left: 4px solid var(--acento);
+border-radius: 8px;
+color: var(--texto);
+}
+hr { border: none; border-top: 1px solid var(--linea); margin: 26px 0; }
+
 :target {
-background-color: #fff6d0;
-box-shadow: 0 0 0 6px #fff6d0;
-border-radius: 3px;
+background-color: var(--foco);
+box-shadow: 0 0 0 8px var(--foco);
+border-radius: 8px;
 animation: ayuda-foco 1.8s ease-out 1;
 }
 @keyframes ayuda-foco {
-0% { background-color: #ffe066; box-shadow: 0 0 0 6px #ffe066; }
-100% { background-color: #fff6d0; box-shadow: 0 0 0 6px #fff6d0; }
+0% { background-color: var(--foco-2); box-shadow: 0 0 0 8px var(--foco-2); }
+100% { background-color: var(--foco); box-shadow: 0 0 0 8px var(--foco); }
+}
+
+@media print {
+:root { color-scheme: light; --fondo: #fff; --texto: #000; }
+body { max-width: none; padding: 0; }
+h3 { background: none; border-left: none; padding: 0; }
 }
 </style>
 </head>
