@@ -211,8 +211,8 @@ input:focus, select:focus {
   text-transform: none; letter-spacing: 0; font-weight: 500; color: var(--tinta);
 }
 .scroll-cols {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 8px 14px;
-  max-height: 400px; overflow: auto; padding: 4px 2px;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(272px, 1fr)); gap: 8px 10px;
+  max-height: 400px; overflow: auto; padding: 4px 2px; align-content: start;
 }
 .col-campo {
   display: flex; flex-direction: column; font-size: 11px; color: var(--tinta-2); gap: 3px;
@@ -220,11 +220,14 @@ input:focus, select:focus {
 }
 .col-campo span { min-height: 26px; font-weight: 600; letter-spacing: .02em; }
 .fila-detalle {
-  display: grid; grid-template-columns: 34px 1fr 130px 140px; gap: 8px; padding: 6px;
-  border-bottom: 1px solid #efece3; font-size: 12.5px; align-items: center;
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 8px;
+  padding: 7px 9px; border: 1px solid var(--linea); border-radius: 8px; background: var(--blanco);
+  font-size: 12.5px;
 }
-.fila-detalle .num { color: var(--rojo); font-weight: 700; font-family: var(--mono); font-size: 12px; }
-.fila-detalle .val { font-variant-numeric: tabular-nums; color: var(--tinta-2); }
+.fila-detalle .num { flex: 0 0 20px; color: var(--rojo); font-weight: 700; font-family: var(--mono); font-size: 12px; }
+.fila-detalle .lbl { flex: 1 1 calc(100% - 28px); line-height: 1.35; }
+.fila-detalle .val { margin-top: 3px; font-variant-numeric: tabular-nums; color: var(--tinta-2); }
+.fila-detalle .val:last-child { font-weight: 700; color: var(--tinta); }
 .resumen {
   background: var(--azul-bg); border: 1px solid #c9d8f0; padding: 10px 14px; border-radius: 8px;
   margin: 10px 0; font-size: 13.5px;
@@ -264,7 +267,7 @@ input:focus, select:focus {
   .app { padding: 14px 12px 40px; }
   .topbar { align-items: flex-start; }
   .form-grid { grid-template-columns: 1fr; }
-  .fila-detalle { grid-template-columns: 30px 1fr 110px 120px; }
+  .fila-detalle { font-size: 12px; }
   .modal { padding: 3vh 10px; }
 }
 
