@@ -2,7 +2,7 @@
 
 **Video:** 5–7 min · **Aplicación:** FactorUno, el mantenedor de calificaciones tributarias de dividendos que desarrollé para la empresa **nuam** (la bolsa). **Caso:** cierre de dividendos del ejercicio 2024.
 **Quién habla:** el autor, en primera persona. **Regla del profesor:** mostrar la app, no disertar; frases de 5–10 segundos.
-**Cómo leer:** cada toma trae **Hacer** (clic por clic) → **Decir** (se lee tal cual) → **Ver** (lo que debe verse). ¿Alguna palabra no se entiende? Está **`glosario.md`** en esta misma carpeta, que la explica en simple.
+**Cómo leer:** cada toma trae **Hacer** (clic por clic) → **Decir** (se lee tal cual) → **Ver** (lo que debe verse).
 
 ## Antes de grabar
 
