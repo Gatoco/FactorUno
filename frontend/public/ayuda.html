@@ -81,6 +81,19 @@ margin: 12px auto;
 break-inside: avoid;
 page-break-inside: avoid;
 }
+
+html { scroll-behavior: smooth; }
+h2, h3, h4 { scroll-margin-top: 16px; }
+:target {
+background-color: #fff6d0;
+box-shadow: 0 0 0 6px #fff6d0;
+border-radius: 3px;
+animation: ayuda-foco 1.8s ease-out 1;
+}
+@keyframes ayuda-foco {
+0% { background-color: #ffe066; box-shadow: 0 0 0 6px #ffe066; }
+100% { background-color: #fff6d0; box-shadow: 0 0 0 6px #fff6d0; }
+}
 </style>
 </head>
 <body>
