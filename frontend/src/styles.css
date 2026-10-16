@@ -227,7 +227,8 @@ input:focus, select:focus {
 .fila-detalle .num { flex: 0 0 20px; color: var(--rojo); font-weight: 700; font-family: var(--mono); font-size: 12px; }
 .fila-detalle .lbl { flex: 1 1 calc(100% - 28px); line-height: 1.35; }
 .fila-detalle .val { margin-top: 3px; font-variant-numeric: tabular-nums; color: var(--tinta-2); }
-.fila-detalle .val:last-child { font-weight: 700; color: var(--tinta); }
+.fila-detalle .val + .val { margin-left: 10px; }
+.fila-detalle .val:last-child { margin-left: 10px; font-weight: 700; color: var(--tinta); }
 .resumen {
   background: var(--azul-bg); border: 1px solid #c9d8f0; padding: 10px 14px; border-radius: 8px;
   margin: 10px 0; font-size: 13.5px;
